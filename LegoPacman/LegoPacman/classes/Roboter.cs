@@ -78,7 +78,7 @@ namespace LegoPacman.classes
         {
             vehicle.Forward(100);
 
-            for (int i = 0, n = cm / CM_PER_TIME; i < n; i++)
+            for (int i = 0; i < cm; i += CM_PER_TIME)
             {
                 Thread.Sleep(SLEEP_TIME_IN_MS);
             }
