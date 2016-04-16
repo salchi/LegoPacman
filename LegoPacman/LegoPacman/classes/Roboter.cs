@@ -48,10 +48,6 @@ namespace LegoPacman.classes
 
             Rotate(3, RotationDirection.Right);
 
-            int angleDelta = 0;
-            int oldDistance = infraredSensor.ReadDistance();
-            int newDistance;
-
             if (infraredSensor.ReadDistance() > distance)
             {
                 vehicle.SpinLeft(SPEED_LOW);
@@ -61,10 +57,14 @@ namespace LegoPacman.classes
                 vehicle.SpinRight(SPEED_LOW);
             }
 
-            while (angleDelta <= 0)
+            int distanceDelta = 0;
+            int oldDistance = infraredSensor.ReadDistance();
+            int newDistance;
+
+            while (distanceDelta <= 0)
             {
                 newDistance = infraredSensor.ReadDistance();
-                angleDelta = newDistance - oldDistance;
+                distanceDelta = newDistance - oldDistance;
                 oldDistance = newDistance;
             }
 

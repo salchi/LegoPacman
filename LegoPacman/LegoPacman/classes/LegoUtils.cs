@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LegoTest2
@@ -19,6 +20,12 @@ namespace LegoTest2
                 LcdConsole.WriteLine(content.Substring(linesPrinted * CHARS_PER_LINE, CHARS_PER_LINE));
                 linesPrinted++;
             }
+        }
+
+        public static void PrintAndWait(int durationInSeconds, string s, params object[] objects)
+        {
+            LcdConsole.WriteLine(s, objects);
+            Thread.Sleep(durationInSeconds * 1000);
         }
 
         public static void NullPrint(string name, object o)
