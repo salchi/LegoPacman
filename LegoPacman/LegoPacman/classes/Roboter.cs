@@ -149,6 +149,7 @@ namespace LegoPacman.classes
             degrees = (direction == RotationDirection.Right) ? -degrees : degrees;
 
             var currentAngle = ReadGyro();
+            LcdConsole.WriteLine("curr {0} degrees {1}", currentAngle, degrees);
             var targetAngle = GetTargetAngle(currentAngle, degrees);
             LcdConsole.WriteLine("target: {0}", targetAngle);
 
@@ -183,28 +184,27 @@ namespace LegoPacman.classes
         {
             var currentAngle = ReadGyro();
             var delta = GetDelta(targetAngle, currentAngle);
+            var speed = GetRotatingSpeed(delta);
 
             LcdConsole.WriteLine("curr: {0}; delta:{1}",currentAngle, delta);
-            Spin(GetRotatingSpeed(delta), direction);
+            Spin(speed, direction);
 
             Thread.Sleep(4000);
-            var i = 0;
+
             while (delta > BOUND_STOP_SPINNING)
             {
                 currentAngle = ReadGyro();
                 delta = GetDelta(targetAngle, currentAngle);
+
                 if (delta <= BOUND_REDUCE_SPEED)
                 {
-                    Spin(GetRotatingSpeed(delta), direction);
+                    var newSpeed = GetRotatingSpeed(delta);
+                    if (newSpeed != speed)
+                    {
+                        Spin(GetRotatingSpeed(delta), direction);
+                        speed = newSpeed;
+                    }
                 }
-
-                if (i % 10 == 0)
-                {
-                    LcdConsole.WriteLine("curr: {0}; delta:{1}", currentAngle, delta);
-                    Thread.Sleep(2000);
-                }
-
-                i++;
             }
 
             vehicle.Brake();
