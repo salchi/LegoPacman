@@ -7,7 +7,7 @@ using MonoBrickFirmware.Sensors;
 using MonoBrickFirmware.Movement;
 using MonoBrickFirmware.Display;
 using System.Threading;
-
+using LegoTest2;
 
 namespace LegoPacman.classes
 {
@@ -44,15 +44,15 @@ namespace LegoPacman.classes
 
         public void AlignAlongRightSide()
         {
+            LegoUtils.PrintAndWait(3, "starting align");
             int distance = infraredSensor.ReadDistance();
+            LcdConsole.WriteLine("initial distance: {0}", distance);
 
             Rotate(3, RotationDirection.Right);
 
-            int angleDelta = 0;
-            int oldDistance = infraredSensor.ReadDistance();
-            int newDistance;
-
-            if (infraredSensor.ReadDistance() > distance)
+            int tempDistance = infraredSensor.ReadDistance();
+            LcdConsole.WriteLine("second distance: {0}", tempDistance);
+            if (tempDistance > distance)
             {
                 vehicle.SpinLeft(SPEED_LOW);
             }
@@ -61,13 +61,19 @@ namespace LegoPacman.classes
                 vehicle.SpinRight(SPEED_LOW);
             }
 
-            while (angleDelta <= 0)
+            int distanceDelta = 0;
+            int oldDistance = infraredSensor.ReadDistance();
+            int newDistance;
+
+            while (distanceDelta <= 0)
             {
                 newDistance = infraredSensor.ReadDistance();
-                angleDelta = newDistance - oldDistance;
+                distanceDelta = newDistance - oldDistance;
+                LegoUtils.PrintAndWait(2, "old: {0} new: {1} delta: {2}", oldDistance, newDistance, distanceDelta);
                 oldDistance = newDistance;
             }
 
+            LegoUtils.PrintAndWait(3, "align finished");
             vehicle.Brake();
         }
 
@@ -79,16 +85,20 @@ namespace LegoPacman.classes
         private const int TARGET_FENCE_DISTANCE = 2;
         public void MoveToFence()
         {
+            LegoUtils.PrintAndWait(3, "starting align");
             int distance = infraredSensor.ReadDistance();
+            LcdConsole.WriteLine("initial distance: {0}", distance);
 
             if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_IN_CM))
             {
+                LegoUtils.PrintAndWait(3, "fast, distance = {0}", distance - IR_TO_FRONT_IN_CM - SLOW_DISTANCE_IN_CM));
                 Rotate(90, RotationDirection.Left);
                 MoveForwardByCm(distance - IR_TO_FRONT_IN_CM - SLOW_DISTANCE_IN_CM);
                 Rotate(90 - ANGLE_TO_FENCE, RotationDirection.Left);
             }
             else
             {
+                LegoUtils.PrintAndWait(3, "slow");
                 Rotate(ANGLE_TO_FENCE, RotationDirection.Right);
             }
 
@@ -99,16 +109,19 @@ namespace LegoPacman.classes
             }
 
             Rotate(ANGLE_TO_FENCE, RotationDirection.Left);
+            LegoUtils.PrintAndWait(3, "finished moveToFence");
         }
 
         private const int SLEEP_TIME_IN_MS = 50;
         private const int CM_PER_TIME = 3;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
+            LegoUtils.PrintAndWait(3, "movecm: {0}", cm);
             vehicle.Forward(SPEED_MAX);
 
             for (int i = 0; i < cm; i += CM_PER_TIME)
             {
+                LcdConsole.WriteLine("step: {0}", i);
                 Thread.Sleep(SLEEP_TIME_IN_MS);
             }
 
@@ -116,6 +129,7 @@ namespace LegoPacman.classes
             {
                 vehicle.Brake();
             }
+            LegoUtils.PrintAndWait(3, "finished movecm");
         }
 
         private int GetTargetAngle(int startAngle, int degreesToRotate)
