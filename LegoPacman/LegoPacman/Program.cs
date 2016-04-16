@@ -25,26 +25,22 @@ namespace LegoPacman
             };
 
             roboter = new Roboter();
-            TestRotation(90);
-            TestRotation(270);
-            TestRotation(180);
-            TestRotation(360);
-            TestRotation(540);
-            TestRotation(810);
-            TestRotation(-90);
-            TestRotation(-180);
-            TestRotation(-270);
-            TestRotation(-360);
-            TestRotation(-810);
-            TestRotation(-900);
+            TestRotation(90, RotationDirection.Left);
+            TestRotation(90, RotationDirection.Right);
+            TestRotation(180, RotationDirection.Left);
+            TestRotation(180, RotationDirection.Right);
+            TestRotation(360, RotationDirection.Left);
+            TestRotation(360, RotationDirection.Right);
+            TestRotation(45, RotationDirection.Left);
+            TestRotation(45, RotationDirection.Right);
 
             terminateProgram.WaitOne();
         }
 
-        private static void TestRotation(int degrees)
+        private static void TestRotation(int degrees, RotationDirection direction)
         {
             MonoBrickFirmware.Display.LcdConsole.WriteLine("{0} degrees", degrees);
-            roboter.Rotate(degrees);
+            roboter.Rotate(degrees, direction);
             Thread.Sleep(1000);
         }
     }
