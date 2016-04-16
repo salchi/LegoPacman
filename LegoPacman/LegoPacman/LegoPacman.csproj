@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MonoBrickFirmware">
-      <HintPath>..\..\..\..\..\Downloads\MonoBrick\MonoBrickFirmware.dll</HintPath>
+      <HintPath>..\..\..\..\..\Downloads\MonoBrick (1)\MonoBrickFirmware.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,6 +46,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="classes\ColorAnalyzer.cs" />
+    <Compile Include="classes\ColorReader.cs" />
+    <Compile Include="classes\KnownColor.cs" />
+    <Compile Include="classes\LegoUtils.cs" />
+    <Compile Include="classes\RGBColorHelper.cs" />
     <Compile Include="classes\Roboter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
