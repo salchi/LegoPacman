@@ -23,6 +23,9 @@ namespace LegoPacman.classes
         private const MotorPort PORT_MOTOR_RIGHT = MotorPort.OutD;
 
         private const int BOUND_REDUCE_SPEED = 5;
+        private const int MAX_SPEED = 100;
+        private const int INTERMEDIATE_SPEED = 50;
+        private const int SLOW_SPEED = 15;
 
         private EV3GyroSensor gyroSensor;
         private EV3IRSensor infraredSensor;
@@ -59,24 +62,46 @@ namespace LegoPacman.classes
             }
         }
 
+        public void AlignAlongRightSide()
+        {
+
+        }
+
         // in cm
-        private const int FAST_THRESHOLD_IN_CM = 20;
+        private const int FAST_DISTANCE_IN_CM = 20;
         private const int IR_TO_FRONT_IN_CM = 15;
+        private const int SLOW_DISTANCE_IN_CM = 5;
+        private const int ANGLE_TO_FENCE = 10;
+        private const int TARGET_FENCE_DISTANCE = 3;
         public void MoveToFence()
         {
-            int initialDistance = infraredSensor.ReadDistance();
+            int distance = infraredSensor.ReadDistance();
 
-            if (initialDistance >= (FAST_THRESHOLD_IN_CM + IR_TO_FRONT_IN_CM))
+            if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_IN_CM))
             {
-
+                Rotate(90);
+                MoveForwardByCm(distance - IR_TO_FRONT_IN_CM - SLOW_DISTANCE_IN_CM);
+                Rotate(-(90 - ANGLE_TO_FENCE));
             }
+            else
+            {
+                Rotate(ANGLE_TO_FENCE);
+            }
+
+            distance = infraredSensor.ReadDistance();
+            while (distance > TARGET_FENCE_DISTANCE)
+            {
+                vehicle.Forward(INTERMEDIATE_SPEED);
+            }
+
+            Rotate(-ANGLE_TO_FENCE);
         }
 
         private const int SLEEP_TIME_IN_MS = 50;
         private const int CM_PER_TIME = 3;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
-            vehicle.Forward(100);
+            vehicle.Forward(MAX_SPEED);
 
             for (int i = 0; i < cm; i += CM_PER_TIME)
             {
