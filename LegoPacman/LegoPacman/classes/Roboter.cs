@@ -91,7 +91,7 @@ namespace LegoPacman.classes
 
             if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_IN_CM))
             {
-                LegoUtils.PrintAndWait(3, "fast, distance = {0}", distance - IR_TO_FRONT_IN_CM - SLOW_DISTANCE_IN_CM));
+                LegoUtils.PrintAndWait(3, "fast, distance = {0}", distance - IR_TO_FRONT_IN_CM - SLOW_DISTANCE_IN_CM);
                 Rotate(90, RotationDirection.Left);
                 MoveForwardByCm(distance - IR_TO_FRONT_IN_CM - SLOW_DISTANCE_IN_CM);
                 Rotate(90 - ANGLE_TO_FENCE, RotationDirection.Left);
@@ -150,6 +150,7 @@ namespace LegoPacman.classes
 
             var currentAngle = ReadGyro();
             var targetAngle = GetTargetAngle(currentAngle, degrees);
+            LcdConsole.WriteLine("target: {0}", targetAngle);
 
             DoRotate(targetAngle, direction);
         }
@@ -187,7 +188,7 @@ namespace LegoPacman.classes
             Spin(GetRotatingSpeed(delta), direction);
 
             Thread.Sleep(4000);
-
+            var i = 0;
             while (delta > BOUND_STOP_SPINNING)
             {
                 currentAngle = ReadGyro();
@@ -196,6 +197,14 @@ namespace LegoPacman.classes
                 {
                     Spin(GetRotatingSpeed(delta), direction);
                 }
+
+                if (i % 10 == 0)
+                {
+                    LcdConsole.WriteLine("curr: {0}; delta:{1}", currentAngle, delta);
+                    Thread.Sleep(2000);
+                }
+
+                i++;
             }
 
             vehicle.Brake();

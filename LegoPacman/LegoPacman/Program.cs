@@ -27,10 +27,10 @@ namespace LegoPacman
             roboter = new Roboter();
             TestRotation(90, RotationDirection.Left);
             TestRotation(90, RotationDirection.Right);
-            TestRotation(180, RotationDirection.Left);
+            /*TestRotation(180, RotationDirection.Left);
             TestRotation(180, RotationDirection.Right);
             TestRotation(360, RotationDirection.Left);
-            TestRotation(360, RotationDirection.Right);
+            TestRotation(360, RotationDirection.Right);*/
             TestRotation(45, RotationDirection.Left);
             TestRotation(45, RotationDirection.Right);
 
