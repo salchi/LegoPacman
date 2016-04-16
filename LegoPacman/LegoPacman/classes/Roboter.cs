@@ -11,7 +11,7 @@ namespace LegoPacman.classes
 {
     enum RotationDirection
     {
-        left,right
+        Left,Right
     }
 
     class Roboter
@@ -46,12 +46,12 @@ namespace LegoPacman.classes
             if (delta <= 180 && delta > 0)
             {
                 LcdConsole.WriteLine("rotating left... delta {0}", delta);
-                DoRotate(targetAngle, RotationDirection.left);
+                DoRotate(targetAngle, RotationDirection.Left);
             }
             else if(delta < 0 && delta >= -180)
             {
                 LcdConsole.WriteLine("rotating right... delta {0}", delta);
-                DoRotate(targetAngle, RotationDirection.right);
+                DoRotate(targetAngle, RotationDirection.Right);
             }
         }
 
@@ -73,10 +73,10 @@ namespace LegoPacman.classes
             LcdConsole.WriteLine("currentAngle: {0}; speed:{1}",currentAngle, speed);
             switch (direction)
             {
-                case RotationDirection.left:
+                case RotationDirection.Left:
                     vehicle.SpinLeft(speed);
                     break;
-                case RotationDirection.right:
+                case RotationDirection.Right:
                     vehicle.SpinRight(speed);
                     break;
             }
