@@ -19,15 +19,19 @@ namespace LegoPacman.classes
     class Roboter
     {
         private const SensorPort PORT_GYRO = SensorPort.In2;
+        private const SensorPort PORT_INFRARED = SensorPort.In3;
         private const MotorPort PORT_MOTOR_LEFT = MotorPort.OutA;
         private const MotorPort PORT_MOTOR_RIGHT = MotorPort.OutD;
+
     
         private const int BOUND_REDUCE_SPEED = 5;
+        private const int BOUND_STOP_SPINNING = 2;
         private const int SPEED_MAX = 100;
         private const int SPEED_INTERMEDIATE = 50;
         private const int SPEED_LOW = 15;
 
         private EV3GyroSensor gyroSensor;
+        private EV3IRSensor infraredSensor;
         private Vehicle vehicle;
 
         public Roboter()
@@ -42,7 +46,7 @@ namespace LegoPacman.classes
         {
             int distance = infraredSensor.ReadDistance();
 
-            RotateRight(3);
+            Rotate(3, RotationDirection.Right);
 
             int angleDelta = 0;
             int oldDistance = infraredSensor.ReadDistance();
@@ -79,13 +83,13 @@ namespace LegoPacman.classes
 
             if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_IN_CM))
             {
-                RotateRight(90);
+                Rotate(90, RotationDirection.Left);
                 MoveForwardByCm(distance - IR_TO_FRONT_IN_CM - SLOW_DISTANCE_IN_CM);
-                RotateLeft(90 - ANGLE_TO_FENCE);
+                Rotate(90 - ANGLE_TO_FENCE, RotationDirection.Left);
             }
             else
             {
-                RotateRight(ANGLE_TO_FENCE);
+                Rotate(ANGLE_TO_FENCE, RotationDirection.Right);
             }
 
             distance = infraredSensor.ReadDistance();
@@ -94,7 +98,7 @@ namespace LegoPacman.classes
                 vehicle.Forward(SPEED_INTERMEDIATE);
             }
 
-            RotateLeft(ANGLE_TO_FENCE);
+            Rotate(ANGLE_TO_FENCE, RotationDirection.Left);
         }
 
         private const int SLEEP_TIME_IN_MS = 50;
@@ -116,7 +120,8 @@ namespace LegoPacman.classes
 
         private int GetTargetAngle(int startAngle, int degreesToRotate)
         {
-            return (startAngle + degreesToRotate) % 360;
+            var targetAngle = (startAngle + degreesToRotate) % 360;
+            return (targetAngle < 0) ? targetAngle + 360 : targetAngle;
         }
 
         private sbyte GetRotatingSpeed(int delta)
@@ -124,45 +129,28 @@ namespace LegoPacman.classes
             return Convert.ToSByte((delta > BOUND_REDUCE_SPEED) ? 100 : 10);
         }
 
-        public void Rotate(int degrees)
+        public void Rotate(int degrees, RotationDirection direction)
         {
             degrees %= 360;
-            degrees = (degrees < 0) ? degrees + 360 : degrees;
+            degrees = (direction == RotationDirection.Right) ? -degrees : degrees;
 
             LcdConsole.WriteLine("degrees: {0}", degrees);
 
-            var currentAngle = gyroSensor.Read();
+            var currentAngle = ReadGyro();
             var targetAngle = GetTargetAngle(currentAngle, degrees);
-            var delta = targetAngle - currentAngle;
+            LcdConsole.WriteLine("target {0}", targetAngle);
 
-            if (delta <= 180 && delta > 0)
-            {
-                LcdConsole.WriteLine("rotating left... delta {0}", delta);
-                DoRotate(targetAngle, RotationDirection.Left);
-            }
-            else if(delta < 0 && delta >= -180)
-            {
-                LcdConsole.WriteLine("rotating right... delta {0}", delta);
-                DoRotate(targetAngle, RotationDirection.Right);
-            }
+            DoRotate(targetAngle, direction);
         }
 
-        private int GetTargetAngle(int startAngle, int degreesToRotate)
+        private int ReadGyro()
         {
-            return (startAngle + degreesToRotate) % 360;
+            var angle = gyroSensor.Read();
+            return (angle > 0) ? 360 + angle : Math.Abs(angle); 
         }
 
-        private sbyte GetRotatingSpeed(int delta)
+        private void Spin(sbyte speed, RotationDirection direction)
         {
-            return Convert.ToSByte((delta > BOUND_REDUCE_SPEED) ? 100 : 10);
-        }
-
-        private void DoRotate(int targetAngle, RotationDirection direction)
-        {
-            var currentAngle = gyroSensor.Read();
-            var speed = GetRotatingSpeed(Math.Abs(targetAngle - currentAngle));
-
-            LcdConsole.WriteLine("currentAngle: {0}; speed:{1}",currentAngle, speed);
             switch (direction)
             {
                 case RotationDirection.Left:
@@ -172,10 +160,30 @@ namespace LegoPacman.classes
                     vehicle.SpinRight(speed);
                     break;
             }
+        }
 
-            while (currentAngle != targetAngle)
+        private int GetDelta(int number1, int number2)
+        {
+            return Math.Abs(Math.Abs(number1) - Math.Abs(number2));
+        }
+
+        private void DoRotate(int targetAngle, RotationDirection direction)
+        {
+            var currentAngle = ReadGyro();
+            var delta = GetDelta(targetAngle, currentAngle);
+
+            LcdConsole.WriteLine("curr: {0}; delta:{1}",currentAngle, delta);
+            Spin(GetRotatingSpeed(delta), direction);
+
+            System.Threading.Thread.Sleep(4000);
+
+            while (delta > BOUND_STOP_SPINNING)
             {
-                currentAngle = gyroSensor.Read();
+                currentAngle = ReadGyro();
+                if (delta <= BOUND_REDUCE_SPEED)
+                {
+                    Spin(GetRotatingSpeed(delta), direction);
+                }
             }
 
             vehicle.Brake();
