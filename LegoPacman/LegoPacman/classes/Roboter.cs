@@ -132,81 +132,72 @@ namespace LegoPacman.classes
             LegoUtils.PrintAndWait(3, "finished movecm");
         }
 
-        private int GetTargetAngle(int startAngle, int degreesToRotate)
+        private int ReadGyro(RotationDirection direction)
         {
-            var targetAngle = (startAngle + degreesToRotate) % 360;
-            return (targetAngle < 0) ? targetAngle + 360 : targetAngle;
+            if (direction == RotationDirection.Left)
+            {
+                return Math.Abs(gyroSensor.Read());
+            }
+            else
+            {
+                return 360 - gyroSensor.Read();
+            }
+        }
+
+        private bool NeedToStopSpinning(RotationDirection direction, int currentAngle, int targetAngle)
+        {
+            return getAbsDelta(currentAngle, targetAngle) <= BOUND_STOP_SPINNING;
+        }
+
+        private int getAbsDelta(int currentAngle, int targetAngle)
+        {
+            return Math.Abs(currentAngle - targetAngle);
         }
 
         private sbyte GetRotatingSpeed(int delta)
         {
-            return Convert.ToSByte((delta > BOUND_REDUCE_SPEED) ? 100 : 10);
+            return (delta <= BOUND_REDUCE_SPEED) ? Convert.ToSByte(SPEED_LOW) : Convert.ToSByte(SPEED_MAX);
+        }
+
+        private void SetRotatingSpeed(Vehicle vehicle, int delta, RotationDirection direction)
+        {
+            if (delta <= BOUND_REDUCE_SPEED)
+            {
+                if (direction == RotationDirection.Left)
+                {
+                    vehicle.SpinLeft(GetRotatingSpeed(delta));
+                }
+                else
+                {
+                    vehicle.SpinRight(GetRotatingSpeed(delta));
+                }
+            }
         }
 
         public void Rotate(int degrees, RotationDirection direction)
         {
-            degrees %= 360;
-            degrees = (direction == RotationDirection.Right) ? -degrees : degrees;
+            gyroSensor.Reset();
 
-            var currentAngle = ReadGyro();
-            LcdConsole.WriteLine("curr {0} degrees {1}", currentAngle, degrees);
-            var targetAngle = GetTargetAngle(currentAngle, degrees);
-            LcdConsole.WriteLine("target: {0}", targetAngle);
+            var currentAngle = ReadGyro(direction);
+            Vehicle vehicle = new Vehicle(MotorPort.OutD, MotorPort.OutA);
 
-            DoRotate(targetAngle, direction);
-        }
-
-        private int ReadGyro()
-        {
-            var angle = gyroSensor.Read();
-            return (angle > 0) ? 360 - angle : Math.Abs(angle); 
-        }
-
-        private void Spin(sbyte speed, RotationDirection direction)
-        {
-            switch (direction)
+            int targetAngle;
+            if (direction == RotationDirection.Left)
             {
-                case RotationDirection.Left:
-                    vehicle.SpinLeft(speed);
-                    break;
-                case RotationDirection.Right:
-                    vehicle.SpinRight(speed);
-                    break;
+                targetAngle = degrees;
+                vehicle.SpinLeft(GetRotatingSpeed(getAbsDelta(currentAngle, targetAngle)));
             }
-        }
-
-        private int GetDelta(int number1, int number2)
-        {
-            return Math.Abs(Math.Abs(number1) - Math.Abs(number2));
-        }
-
-        private void DoRotate(int targetAngle, RotationDirection direction)
-        {
-            var currentAngle = ReadGyro();
-            var delta = GetDelta(targetAngle, currentAngle);
-            var speed = GetRotatingSpeed(delta);
-
-            LcdConsole.WriteLine("curr: {0}; delta:{1}",currentAngle, delta);
-            Spin(speed, direction);
-
-            Thread.Sleep(4000);
-
-            while (delta > BOUND_STOP_SPINNING)
+            else
             {
-                currentAngle = ReadGyro();
-                delta = GetDelta(targetAngle, currentAngle);
-
-                if (delta <= BOUND_REDUCE_SPEED)
-                {
-                    var newSpeed = GetRotatingSpeed(delta);
-                    if (newSpeed != speed)
-                    {
-                        Spin(GetRotatingSpeed(delta), direction);
-                        speed = newSpeed;
-                    }
-                }
+                targetAngle = 360 - degrees;
+                vehicle.SpinRight(GetRotatingSpeed(getAbsDelta(currentAngle, targetAngle)));
             }
 
+            while (!NeedToStopSpinning(direction, currentAngle, targetAngle))
+            {
+                currentAngle = ReadGyro(direction);
+                SetRotatingSpeed(vehicle, getAbsDelta(currentAngle, targetAngle), direction);
+            }
             vehicle.Brake();
         }
     }

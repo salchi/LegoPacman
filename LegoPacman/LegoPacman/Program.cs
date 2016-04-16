@@ -32,27 +32,11 @@ namespace LegoPacman
             roboter = new Roboter();
 
 
-            EV3GyroSensor gs = new EV3GyroSensor(SensorPort.In2);
-
-            gs.Reset();
-            LegoUtils.PrintAndWait(3, "initial gs val {0}", gs.Read());
-
-            int targetAngle = 90;
-
-            int currentAngle = gs.Read();
-
-            Vehicle vehicle = new Vehicle(MotorPort.OutD, MotorPort.OutA);
-            vehicle.SpinLeft(100);
-
-            while (currentAngle < targetAngle - 5)
+            for (int i = 90; i <= 360; i+=90)
             {
-                currentAngle = gs.Read();
-                LcdConsole.WriteLine("current: {0}", currentAngle);
+                roboter.Rotate(i, RotationDirection.Left);
+                roboter.Rotate(i, RotationDirection.Right);
             }
-
-            vehicle.Brake();
-
-            LcdConsole.WriteLine("turn finished");
 
             /*
             TestRotation(90, RotationDirection.Left);
@@ -66,6 +50,8 @@ namespace LegoPacman
             */
             terminateProgram.WaitOne();
         }
+        private static EV3GyroSensor gs = new EV3GyroSensor(SensorPort.In2);
+        
 
         private static void TestRotation(int degrees, RotationDirection direction)
         {
