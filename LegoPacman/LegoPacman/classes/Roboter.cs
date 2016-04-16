@@ -20,11 +20,11 @@ namespace LegoPacman.classes
     {
         private const SensorPort PORT_GYRO = SensorPort.In2;
         private const SensorPort PORT_INFRARED = SensorPort.In3;
-        private const MotorPort PORT_MOTOR_LEFT = MotorPort.OutA;
-        private const MotorPort PORT_MOTOR_RIGHT = MotorPort.OutD;
+        private const MotorPort PORT_MOTOR_LEFT = MotorPort.OutD;
+        private const MotorPort PORT_MOTOR_RIGHT = MotorPort.OutA;
 
     
-        private const int BOUND_REDUCE_SPEED = 5;
+        private const int BOUND_REDUCE_SPEED = 10;
         private const int BOUND_STOP_SPINNING = 2;
         private const int SPEED_MAX = 100;
         private const int SPEED_INTERMEDIATE = 50;
@@ -134,11 +134,8 @@ namespace LegoPacman.classes
             degrees %= 360;
             degrees = (direction == RotationDirection.Right) ? -degrees : degrees;
 
-            LcdConsole.WriteLine("degrees: {0}", degrees);
-
             var currentAngle = ReadGyro();
             var targetAngle = GetTargetAngle(currentAngle, degrees);
-            LcdConsole.WriteLine("target {0}", targetAngle);
 
             DoRotate(targetAngle, direction);
         }
@@ -146,7 +143,7 @@ namespace LegoPacman.classes
         private int ReadGyro()
         {
             var angle = gyroSensor.Read();
-            return (angle > 0) ? 360 + angle : Math.Abs(angle); 
+            return (angle > 0) ? 360 - angle : Math.Abs(angle); 
         }
 
         private void Spin(sbyte speed, RotationDirection direction)
@@ -175,11 +172,12 @@ namespace LegoPacman.classes
             LcdConsole.WriteLine("curr: {0}; delta:{1}",currentAngle, delta);
             Spin(GetRotatingSpeed(delta), direction);
 
-            System.Threading.Thread.Sleep(4000);
+            Thread.Sleep(4000);
 
             while (delta > BOUND_STOP_SPINNING)
             {
                 currentAngle = ReadGyro();
+                delta = GetDelta(targetAngle, currentAngle);
                 if (delta <= BOUND_REDUCE_SPEED)
                 {
                     Spin(GetRotatingSpeed(delta), direction);
