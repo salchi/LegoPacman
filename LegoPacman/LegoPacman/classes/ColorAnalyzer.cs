@@ -11,21 +11,27 @@ namespace LegoTest2
 {
     public class ColorAnalyzer
     {
-        public ConcurrentBag<KnownColor> ValidColors { get; } = new ConcurrentBag<KnownColor>();
+        public ConcurrentBag<KnownColor> ValidColors { get; }
 
-        private static readonly double maxAllowedSpikeDistance = 35d;
-        private static readonly double maxAvgDistance = 25d;
+        private const double MAX_ALLOWED_SPIKE_DISTANCE = 35d;
+        private const double MAX_AVG_DISTANCE = 25d;
+
+        public ColorAnalyzer()
+        {
+           ValidColors = new ConcurrentBag<KnownColor>();
+        }
+        
         public KnownColor Analyze(RGBColor c)
         {
-            double currentDistance= maxAvgDistance;
+            double currentDistance= MAX_AVG_DISTANCE;
             KnownColor result = KnownColor.Invalid;
 
             foreach(KnownColor kc in ValidColors)
             {
-                double tempDistance = averageDistance(kc, c);
-                LcdConsole.WriteLine("{0} {1} {2}", kc, tempDistance, maxDistance(kc, c));
+                double tempDistance = AverageDistance(kc, c);
+                LcdConsole.WriteLine("{0} {1} {2}", kc, tempDistance, MaxDistance(kc, c));
 
-                if (spikeTest(kc, c) && tempDistance < currentDistance)
+                if (SpikeTest(kc, c) && tempDistance < currentDistance)
                 {
                     currentDistance = tempDistance;
                     result = kc;
@@ -35,19 +41,19 @@ namespace LegoTest2
             return result;
         }
 
-        private static bool spikeTest(KnownColor kc, RGBColor c)
+        private static bool SpikeTest(KnownColor kc, RGBColor c)
         {
-            return maxDistance(kc, c) <= maxAllowedSpikeDistance;
+            return MaxDistance(kc, c) <= MAX_ALLOWED_SPIKE_DISTANCE;
         }
 
-        private static double maxDistance(KnownColor kc, RGBColor c)
+        private static double MaxDistance(KnownColor kc, RGBColor c)
         {
             RGBColor kcRgb = kc.TargetColor;
 
             return LegoUtils.Max3(Math.Abs(kcRgb.Red - c.Red), Math.Abs(kcRgb.Green - c.Green), Math.Abs(kcRgb.Blue - c.Blue));
         }
 
-        private static double averageDistance(KnownColor kc, RGBColor c)
+        private static double AverageDistance(KnownColor kc, RGBColor c)
         {
             RGBColor kcRgb = kc.TargetColor;
 

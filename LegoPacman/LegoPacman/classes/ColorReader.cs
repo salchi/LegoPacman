@@ -10,6 +10,9 @@ namespace LegoTest2
 {
     public class ColorReader
     {
+        private const double LOW_INVALID_THRESHOLD = 4d;
+        private const double SPIKE_VALID_THRESHOLD = 8d;
+
         private readonly EV3ColorSensor colorSensor;
         public RGBColor LastRead { get; private set; }
 
@@ -26,12 +29,10 @@ namespace LegoTest2
             return IsValidColor(LastRead);
         }
 
-        private static readonly double lowInvalidThreshold = 4d;
-        private static readonly double spikeValidThreshold = 8d;
         private bool IsValidColor(RGBColor c)
         {
-            return c.Red > lowInvalidThreshold && c.Green > lowInvalidThreshold
-                   && c.Blue > lowInvalidThreshold || LegoUtils.Max3(c.Red, c.Green, c.Blue) >= spikeValidThreshold;
+            return c.Red > LOW_INVALID_THRESHOLD && c.Green > LOW_INVALID_THRESHOLD && 
+                c.Blue > LOW_INVALID_THRESHOLD || LegoUtils.Max3(c.Red, c.Green, c.Blue) >= SPIKE_VALID_THRESHOLD;
         }
     }
 }
