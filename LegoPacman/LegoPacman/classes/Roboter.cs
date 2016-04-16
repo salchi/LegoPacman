@@ -23,9 +23,9 @@ namespace LegoPacman.classes
         private const MotorPort PORT_MOTOR_RIGHT = MotorPort.OutD;
 
         private const int BOUND_REDUCE_SPEED = 5;
-        private const int MAX_SPEED = 100;
-        private const int INTERMEDIATE_SPEED = 50;
-        private const int SLOW_SPEED = 15;
+        private const int SPEED_MAX = 100;
+        private const int SPEED_INTERMEDIATE = 50;
+        private const int SPEED_LOW = 15;
 
         private EV3GyroSensor gyroSensor;
         private EV3IRSensor infraredSensor;
@@ -37,6 +37,16 @@ namespace LegoPacman.classes
             gyroSensor.Reset();
             infraredSensor = new EV3IRSensor(PORT_INFRARED, IRMode.Proximity);
             vehicle = new Vehicle(PORT_MOTOR_LEFT, PORT_MOTOR_RIGHT);
+        }
+
+        public void RotateLeft(int degrees)
+        {
+            Rotate(-degrees);
+        }
+
+        public void RotateRight(int degrees)
+        {
+            Rotate(degrees);
         }
 
         public void Rotate(int degrees)
@@ -64,44 +74,68 @@ namespace LegoPacman.classes
 
         public void AlignAlongRightSide()
         {
+            int distance = infraredSensor.ReadDistance();
 
+            RotateRight(3);
+
+            int angleDelta = 0;
+            int oldDistance = infraredSensor.ReadDistance();
+            int newDistance;
+
+            if (infraredSensor.ReadDistance() > distance)
+            {
+                vehicle.SpinLeft(SPEED_LOW);
+            }
+            else
+            {
+                vehicle.SpinRight(SPEED_LOW);
+            }
+
+            while (angleDelta <= 0)
+            {
+                newDistance = infraredSensor.ReadDistance();
+                angleDelta = newDistance - oldDistance;
+                oldDistance = newDistance;
+            }
+
+            vehicle.Brake();
         }
 
         // in cm
         private const int FAST_DISTANCE_IN_CM = 20;
-        private const int IR_TO_FRONT_IN_CM = 15;
+        private const int IR_TO_FRONT_IN_CM = 18;
         private const int SLOW_DISTANCE_IN_CM = 5;
         private const int ANGLE_TO_FENCE = 10;
-        private const int TARGET_FENCE_DISTANCE = 3;
+        private const int TARGET_FENCE_DISTANCE = 2;
         public void MoveToFence()
         {
             int distance = infraredSensor.ReadDistance();
 
             if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_IN_CM))
             {
-                Rotate(90);
+                RotateRight(90);
                 MoveForwardByCm(distance - IR_TO_FRONT_IN_CM - SLOW_DISTANCE_IN_CM);
-                Rotate(-(90 - ANGLE_TO_FENCE));
+                RotateLeft(90 - ANGLE_TO_FENCE);
             }
             else
             {
-                Rotate(ANGLE_TO_FENCE);
+                RotateRight(ANGLE_TO_FENCE);
             }
 
             distance = infraredSensor.ReadDistance();
             while (distance > TARGET_FENCE_DISTANCE)
             {
-                vehicle.Forward(INTERMEDIATE_SPEED);
+                vehicle.Forward(SPEED_INTERMEDIATE);
             }
 
-            Rotate(-ANGLE_TO_FENCE);
+            RotateLeft(ANGLE_TO_FENCE);
         }
 
         private const int SLEEP_TIME_IN_MS = 50;
         private const int CM_PER_TIME = 3;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
-            vehicle.Forward(MAX_SPEED);
+            vehicle.Forward(SPEED_MAX);
 
             for (int i = 0; i < cm; i += CM_PER_TIME)
             {
