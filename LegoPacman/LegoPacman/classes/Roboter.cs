@@ -40,6 +40,7 @@ namespace LegoPacman.classes
             vehicle = new Vehicle(PORT_MOTOR_LEFT, PORT_MOTOR_RIGHT);
         }
 
+        private const int CORRECTION = 3;
         public void AlignAlongRightSide()
         {
             LegoUtils.PrintAndWait(3, "starting align");
@@ -50,6 +51,8 @@ namespace LegoPacman.classes
 
             var tempDistance = infraredSensor.ReadDistance();
             LcdConsole.WriteLine("second distance: {0}", tempDistance);
+
+            var rotationDirection = RotationDirection.Right;
             if (tempDistance > distance)
             {
                 vehicle.SpinLeft(SPEED_LOW);
@@ -57,6 +60,7 @@ namespace LegoPacman.classes
             else
             {
                 vehicle.SpinRight(SPEED_LOW);
+                rotationDirection = RotationDirection.Left;
             }
 
             var distanceDelta = 0;
@@ -67,12 +71,13 @@ namespace LegoPacman.classes
             {
                 newDistance = infraredSensor.ReadDistance();
                 distanceDelta = newDistance - oldDistance;
-                LegoUtils.PrintAndWait(2, "old: {0} new: {1} delta: {2}", oldDistance, newDistance, distanceDelta);
+                LcdConsole.WriteLine("old: {0} new: {1} delta: {2}", oldDistance, newDistance, distanceDelta);
                 oldDistance = newDistance;
             }
 
-            LegoUtils.PrintAndWait(3, "align finished");
             vehicle.Brake();
+            LegoUtils.PrintAndWait(3, "align finished");
+            Rotate(CORRECTION, (rotationDirection == RotationDirection.Left) ? RotationDirection.Right : RotationDirection.Left);
         }
 
         // in cm
