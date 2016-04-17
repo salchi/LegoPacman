@@ -21,6 +21,7 @@ namespace LegoPacman
 
         static void Main(string[] args)
         {
+            LcdConsole.WriteLine("startup");
             var terminateProgram = new ManualResetEvent(false);
             var buttonEvents = new ButtonEvents();
 
@@ -33,6 +34,7 @@ namespace LegoPacman
 
             roboter.MoveForwardByCm(10);
 
+            LegoUtils.PrintAndWait(5, "program done");
             /*
             for (int i = 90; i <= 360; i+=90)
             {
