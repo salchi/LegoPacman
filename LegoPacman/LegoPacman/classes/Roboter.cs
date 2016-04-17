@@ -112,11 +112,19 @@ namespace LegoPacman.classes
 
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
-            LegoUtils.PrintAndWait(3, "movecm: cm:{0}");
+            try
+            {
+                LegoUtils.PrintAndWait(3, "movecm: cm:{0}");
 
-            vehicle.Backward(SPEED_MAX, (uint)LegoUtils.CmToEngineDegrees(cm), brakeOnFinish);
+                vehicle.Backward(SPEED_MAX, (uint)LegoUtils.CmToEngineDegrees(cm), brakeOnFinish);
 
-            LegoUtils.PrintAndWait(3, "finished movecm");
+                LegoUtils.PrintAndWait(3, "finished movecm");
+            }
+            catch (Exception e)
+            {
+                LegoUtils.LongStringPrint(e.Message);
+                LegoUtils.LongStringPrint(e.StackTrace);
+            }
         }
 
         private int ReadGyro(RotationDirection direction)
