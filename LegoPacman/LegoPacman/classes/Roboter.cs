@@ -43,12 +43,12 @@ namespace LegoPacman.classes
         public void AlignAlongRightSide()
         {
             LegoUtils.PrintAndWait(3, "starting align");
-            int distance = infraredSensor.ReadDistance();
+            var distance = infraredSensor.ReadDistance();
             LcdConsole.WriteLine("initial distance: {0}", distance);
 
             Rotate(3, RotationDirection.Right);
 
-            int tempDistance = infraredSensor.ReadDistance();
+            var tempDistance = infraredSensor.ReadDistance();
             LcdConsole.WriteLine("second distance: {0}", tempDistance);
             if (tempDistance > distance)
             {
@@ -59,8 +59,8 @@ namespace LegoPacman.classes
                 vehicle.SpinRight(SPEED_LOW);
             }
 
-            int distanceDelta = 0;
-            int oldDistance = infraredSensor.ReadDistance();
+            var distanceDelta = 0;
+            var oldDistance = infraredSensor.ReadDistance();
             int newDistance;
 
             while (distanceDelta <= 0)
@@ -84,7 +84,7 @@ namespace LegoPacman.classes
         public void MoveToFence()
         {
             LegoUtils.PrintAndWait(3, "starting align");
-            int distance = infraredSensor.ReadDistance();
+            var distance = infraredSensor.ReadDistance();
             LcdConsole.WriteLine("initial distance: {0}", distance);
 
             if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_IN_CM))
