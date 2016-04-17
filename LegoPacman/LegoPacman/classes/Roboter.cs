@@ -22,8 +22,7 @@ namespace LegoPacman.classes
         private const SensorPort PORT_INFRARED = SensorPort.In3;
         private const MotorPort PORT_MOTOR_LEFT = MotorPort.OutD;
         private const MotorPort PORT_MOTOR_RIGHT = MotorPort.OutA;
-
-    
+ 
         private const int BOUND_REDUCE_SPEED = 10;
         private const int BOUND_STOP_SPINNING = 2;
         private const int SPEED_MAX = 100;
@@ -159,7 +158,7 @@ namespace LegoPacman.classes
             return (delta <= BOUND_REDUCE_SPEED) ? Convert.ToSByte(SPEED_LOW) : Convert.ToSByte(SPEED_MAX);
         }
 
-        private void SetRotatingSpeed(Vehicle vehicle, int delta, RotationDirection direction)
+        private void SetRotatingSpeed(int delta, RotationDirection direction)
         {
             if (delta <= BOUND_REDUCE_SPEED)
             {
@@ -179,7 +178,6 @@ namespace LegoPacman.classes
             gyroSensor.Reset();
 
             var currentAngle = ReadGyro(direction);
-            Vehicle vehicle = new Vehicle(MotorPort.OutD, MotorPort.OutA);
 
             int targetAngle;
             if (direction == RotationDirection.Left)
@@ -196,7 +194,7 @@ namespace LegoPacman.classes
             while (!NeedToStopSpinning(direction, currentAngle, targetAngle))
             {
                 currentAngle = ReadGyro(direction);
-                SetRotatingSpeed(vehicle, getAbsDelta(currentAngle, targetAngle), direction);
+                SetRotatingSpeed(getAbsDelta(currentAngle, targetAngle), direction);
             }
             vehicle.Brake();
         }
