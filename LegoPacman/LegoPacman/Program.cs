@@ -31,13 +31,15 @@ namespace LegoPacman
 
             roboter = new Roboter();
 
+            roboter.MoveForwardByCm(10);
 
+            /*
             for (int i = 90; i <= 360; i+=90)
             {
                 roboter.Rotate(i, RotationDirection.Left);
                 roboter.Rotate(i, RotationDirection.Right);
             }
-
+            */
             /*
             TestRotation(90, RotationDirection.Left);
             TestRotation(90, RotationDirection.Right);

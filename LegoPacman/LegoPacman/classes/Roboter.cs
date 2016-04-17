@@ -111,18 +111,14 @@ namespace LegoPacman.classes
             LegoUtils.PrintAndWait(3, "finished moveToFence");
         }
 
-        private const int SLEEP_TIME_IN_MS = 50;
-        private const int CM_PER_TIME = 3;
+        private const int SLEEP_TIME_PER_CM = 50;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
-            LegoUtils.PrintAndWait(3, "movecm: {0}", cm);
+            int sleepTime = cm * SLEEP_TIME_PER_CM;
+            LegoUtils.PrintAndWait(3, "movecm: cm:{0} sleeping:{1}", cm, sleepTime);
             vehicle.Forward(SPEED_MAX);
 
-            for (int i = 0; i < cm; i += CM_PER_TIME)
-            {
-                LcdConsole.WriteLine("step: {0}", i);
-                Thread.Sleep(SLEEP_TIME_IN_MS);
-            }
+            Thread.Sleep(sleepTime);
 
             if (brakeOnFinish)
             {
