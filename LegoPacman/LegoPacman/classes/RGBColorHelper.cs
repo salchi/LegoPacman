@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace LegoTest2
+namespace LegoPacman.classes
 {
     public static class RGBColorHelper
     {

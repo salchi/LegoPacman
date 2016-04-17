@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace LegoTest2
+namespace LegoPacman.classes
 {
     public static class LegoUtils
     {
@@ -39,6 +39,12 @@ namespace LegoTest2
         public static double Max3(double a, double b, double c)
         {
             return Math.Max(Math.Max(a, b), c);
+        }
+
+        const double DIAMETER = 3.4;
+        public static double CmToEngineDegrees(double distanceInCm)
+        {
+            return (360 * distanceInCm) / (Math.PI * DIAMETER);
         }
     }
 }
