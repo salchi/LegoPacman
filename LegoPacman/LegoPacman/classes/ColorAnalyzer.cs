@@ -23,12 +23,12 @@ namespace LegoPacman.classes
         
         public KnownColor Analyze(RGBColor c)
         {
-            double currentDistance= MAX_AVG_DISTANCE;
-            KnownColor result = KnownColor.Invalid;
+            var currentDistance = MAX_AVG_DISTANCE;
+            var result = KnownColor.Invalid;
 
-            foreach(KnownColor kc in ValidColors)
+            foreach(var kc in ValidColors)
             {
-                double tempDistance = AverageDistance(kc, c);
+                var tempDistance = AverageDistance(kc, c);
                 LcdConsole.WriteLine("{0} {1} {2}", kc, tempDistance, MaxDistance(kc, c));
 
                 if (SpikeTest(kc, c) && tempDistance < currentDistance)
@@ -48,14 +48,14 @@ namespace LegoPacman.classes
 
         private static double MaxDistance(KnownColor kc, RGBColor c)
         {
-            RGBColor kcRgb = kc.TargetColor;
+            var kcRgb = kc.TargetColor;
 
             return LegoUtils.Max3(Math.Abs(kcRgb.Red - c.Red), Math.Abs(kcRgb.Green - c.Green), Math.Abs(kcRgb.Blue - c.Blue));
         }
 
         private static double AverageDistance(KnownColor kc, RGBColor c)
         {
-            RGBColor kcRgb = kc.TargetColor;
+            var kcRgb = kc.TargetColor;
 
             return (Math.Abs(kcRgb.Red - c.Red) + Math.Abs(kcRgb.Green - c.Green) + Math.Abs(kcRgb.Blue - c.Blue)) / 3d;
         }
