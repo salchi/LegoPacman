@@ -34,7 +34,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="MonoBrickFirmware">
-      <HintPath>..\..\..\..\..\Downloads\MonoBrick (1)\MonoBrickFirmware.dll</HintPath>
+      <HintPath>..\..\..\..\..\Desktop\MonoBrickFirmware.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
