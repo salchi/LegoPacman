@@ -52,6 +52,7 @@
     <Compile Include="classes\LegoUtils.cs" />
     <Compile Include="classes\RGBColorHelper.cs" />
     <Compile Include="classes\Roboter.cs" />
+    <Compile Include="classes\RoboTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
