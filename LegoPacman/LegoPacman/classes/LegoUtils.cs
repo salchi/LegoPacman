@@ -13,13 +13,12 @@ namespace LegoPacman.classes
         private const int CHARS_PER_LINE = 24;
         public static void LongStringPrint(string content)
         {
-            int linesPrinted = 0;
-
-            while ((linesPrinted * CHARS_PER_LINE) < content.Length)
+            while (content.Length > CHARS_PER_LINE)
             {
-                LcdConsole.WriteLine(content.Substring(linesPrinted * CHARS_PER_LINE, CHARS_PER_LINE));
-                linesPrinted++;
+                LcdConsole.WriteLine(content.Substring(0, CHARS_PER_LINE));
+                content = content.Substring(CHARS_PER_LINE - 1, Math.Min(CHARS_PER_LINE, content.Length - CHARS_PER_LINE));
             }
+            LcdConsole.WriteLine(content);
         }
 
         public static void PrintAndWait(int durationInSeconds, string s, params object[] objects)
