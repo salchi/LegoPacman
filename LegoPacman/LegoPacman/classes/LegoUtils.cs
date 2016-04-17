@@ -43,7 +43,7 @@ namespace LegoPacman.classes
         const double DIAMETER = 3.4;
         public static double CmToEngineDegrees(double distanceInCm)
         {
-            return (360 * distanceInCm) / (Math.PI * DIAMETER);
+            return (360 * distanceInCm) / (Math.PI * DIAMETER / 2);
         }
     }
 }
