@@ -11,7 +11,7 @@ namespace LegoPacman.classes
     public static class LegoUtils
     {
         private const int CHARS_PER_LINE = 24;
-        public static void LongStringPrint(string content)
+        public static void PrintLongString(string content)
         {
             while (content.Length > CHARS_PER_LINE)
             {

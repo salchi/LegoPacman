@@ -122,8 +122,8 @@ namespace LegoPacman.classes
             }
             catch (Exception e)
             {
-                LegoUtils.LongStringPrint(e.Message);
-                LegoUtils.LongStringPrint(e.StackTrace);
+                LegoUtils.PrintLongString(e.Message);
+                LegoUtils.PrintLongString(e.StackTrace);
             }
         }
 
