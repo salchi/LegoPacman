@@ -110,6 +110,12 @@ namespace LegoPacman.classes
             LegoUtils.PrintAndWait(3, "finished moveToFence");
         }
 
+        private void ForwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
+        {
+            WaitHandle handle = vehicle.Backward(speed, degrees, brakeOnFinish);
+            handle.WaitOne();
+        }
+
         private const int SLOW_THRESHOLD_IN_CM = 1;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
@@ -120,17 +126,15 @@ namespace LegoPacman.classes
 
                 LcdConsole.WriteLine("fast deg: {0} slow deg: {1}", fastDegrees, slowDegrees);
 
-                vehicle.Backward(SPEED_MAX, fastDegrees, brakeOnFinish);
-                vehicle.Backward(SPEED_LOW, SLOW_THRESHOLD_IN_CM, brakeOnFinish);
+                ForwardByDegrees(SPEED_MAX, fastDegrees);
+                ForwardByDegrees(SPEED_LOW, slowDegrees);
             }
             else
             {
                 uint slowDegrees = LegoUtils.CmToEngineDegrees(SLOW_THRESHOLD_IN_CM);
                 LcdConsole.WriteLine("slow deg: {0}", slowDegrees);
-                vehicle.Backward(SPEED_LOW, slowDegrees, brakeOnFinish);
+                ForwardByDegrees(SPEED_LOW, slowDegrees);
             }
-                
-            LegoUtils.PrintAndWait(3, "finished movecm");
         }
 
         private int ReadGyro(RotationDirection direction)
