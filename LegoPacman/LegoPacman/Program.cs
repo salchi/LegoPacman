@@ -20,7 +20,6 @@ namespace LegoPacman
 
         static void Main(string[] args)
         {
-            LcdConsole.WriteLine("startup");
             var terminateProgram = new ManualResetEvent(false);
             var buttonEvents = new ButtonEvents();
 
@@ -29,38 +28,29 @@ namespace LegoPacman
                 terminateProgram.Set();
             };
 
-            roboter = new Roboter();
+            LcdConsole.WriteLine("up: Rotation");
+            LcdConsole.WriteLine("left: MoveForwardByCm");
+            LcdConsole.WriteLine("right: AlignAlongRightSide");
+            LcdConsole.WriteLine("down: MoveToFence");
 
-            roboter.MoveForwardByCm(10);
-
-            LegoUtils.PrintAndWait(5, "program done");
-            /*
-            for (int i = 90; i <= 360; i+=90)
+            buttonEvents.UpPressed += () =>
             {
-                roboter.Rotate(i, RotationDirection.Left);
-                roboter.Rotate(i, RotationDirection.Right);
-            }
-            */
-            /*
-            TestRotation(90, RotationDirection.Left);
-            TestRotation(90, RotationDirection.Right);
-            TestRotation(180, RotationDirection.Left);
-            TestRotation(180, RotationDirection.Right);
-            TestRotation(360, RotationDirection.Left);
-            TestRotation(360, RotationDirection.Right);
-            TestRotation(45, RotationDirection.Left);
-            TestRotation(45, RotationDirection.Right);
-            */
-            terminateProgram.WaitOne();
-        }
-        private static EV3GyroSensor gs = new EV3GyroSensor(SensorPort.In2);
-        
+                RoboTest.Rotation(90, 360, 90);
+            };
+            buttonEvents.LeftPressed += () =>
+            {
+                RoboTest.MoveForwardByCm(10);
+            };
+            buttonEvents.RightPressed += () =>
+            {
+                RoboTest.AlignAlongRightSide();
+            };
+            buttonEvents.DownPressed += () =>
+            {
+                RoboTest.MoveToFence();
+            };
 
-        private static void TestRotation(int degrees, RotationDirection direction)
-        {
-            MonoBrickFirmware.Display.LcdConsole.WriteLine("{0} degrees", degrees);
-            roboter.Rotate(degrees, direction);
-            Thread.Sleep(1000);
+            terminateProgram.WaitOne();
         }
     }
 }
