@@ -114,7 +114,7 @@ namespace LegoPacman.classes
         {
             try
             {
-                LegoUtils.PrintAndWait(3, "movecm: cm:{0}");
+                LegoUtils.PrintAndWait(3, "movecm: cm:{0}", cm);
 
                 vehicle.Backward(SPEED_MAX, (uint)LegoUtils.CmToEngineDegrees(cm), brakeOnFinish);
 
