@@ -132,8 +132,6 @@ namespace LegoPacman.classes
                 uint fastDegrees = LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM);
                 uint slowDegrees = LegoUtils.CmToEngineDegrees(SLOW_THRESHOLD_IN_CM);
 
-                LcdConsole.WriteLine("fast deg: {0} slow deg: {1}", fastDegrees, slowDegrees);
-
                 ForwardByDegrees(SPEED_MAX, fastDegrees);
                 ForwardByDegrees(SPEED_LOW, slowDegrees);
             }
