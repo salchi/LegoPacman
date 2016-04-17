@@ -33,6 +33,15 @@ namespace LegoPacman
             LcdConsole.WriteLine("right: AlignAlongRightSide");
             LcdConsole.WriteLine("down: MoveToFence");
 
+            buttonEvents.EnterPressed += () =>
+            {
+                LcdConsole.Clear();
+                LcdConsole.WriteLine("up: Rotation");
+                LcdConsole.WriteLine("left: MoveForwardByCm");
+                LcdConsole.WriteLine("right: AlignAlongRightSide");
+                LcdConsole.WriteLine("down: MoveToFence");
+            };
+
             buttonEvents.UpPressed += () =>
             {
                 LegoUtils.PrintAndWait(2, "starting Rotation");
