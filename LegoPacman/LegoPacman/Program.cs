@@ -42,6 +42,12 @@ namespace LegoPacman
             buttonEvents.LeftPressed += () =>
             {
                 LegoUtils.PrintAndWait(2, "starting MoveForwardByCm");
+                RoboTest.MoveForwardByCm(2);
+                LegoUtils.PrintAndWait(1, "3");
+                RoboTest.MoveForwardByCm(3);
+                LegoUtils.PrintAndWait(1, "5");
+                RoboTest.MoveForwardByCm(5);
+                LegoUtils.PrintAndWait(1, "10");
                 RoboTest.MoveForwardByCm(10);
                 LegoUtils.PrintAndWait(2, "MoveForwardByCm done");
             };
