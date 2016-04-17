@@ -43,7 +43,7 @@ namespace LegoPacman.classes
         private const int CORRECTION = 3;
         public void AlignAlongRightSide()
         {
-            LegoUtils.PrintAndWait(3, "starting align");
+            LcdConsole.WriteLine("starting align");
             var distance = infraredSensor.ReadDistance();
             LcdConsole.WriteLine("initial distance: {0}", distance);
 
@@ -56,11 +56,11 @@ namespace LegoPacman.classes
             if (tempDistance > distance)
             {
                 vehicle.SpinLeft(SPEED_LOW);
+                rotationDirection = RotationDirection.Left;
             }
             else
             {
                 vehicle.SpinRight(SPEED_LOW);
-                rotationDirection = RotationDirection.Left;
             }
 
             var distanceDelta = 0;
@@ -76,7 +76,7 @@ namespace LegoPacman.classes
             }
 
             vehicle.Brake();
-            LegoUtils.PrintAndWait(3, "align finished");
+            LcdConsole.WriteLine("align finished");
             Rotate(CORRECTION, (rotationDirection == RotationDirection.Left) ? RotationDirection.Right : RotationDirection.Left);
         }
 
