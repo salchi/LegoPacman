@@ -35,19 +35,27 @@ namespace LegoPacman
 
             buttonEvents.UpPressed += () =>
             {
+                LegoUtils.PrintAndWait(2, "starting Rotation");
                 RoboTest.Rotation(90, 360, 90);
+                LegoUtils.PrintAndWait(2, "Rotation done");
             };
             buttonEvents.LeftPressed += () =>
             {
+                LegoUtils.PrintAndWait(2, "starting MoveForwardByCm");
                 RoboTest.MoveForwardByCm(10);
+                LegoUtils.PrintAndWait(2, "MoveForwardByCm done");
             };
             buttonEvents.RightPressed += () =>
             {
+                LegoUtils.PrintAndWait(2, "starting AlignAlongRightSide");
                 RoboTest.AlignAlongRightSide();
+                LegoUtils.PrintAndWait(2, "PrintAndWait done");
             };
             buttonEvents.DownPressed += () =>
             {
+                LegoUtils.PrintAndWait(2, "starting MoveToFence");
                 RoboTest.MoveToFence();
+                LegoUtils.PrintAndWait(2, "MoveToFence done");
             };
 
             terminateProgram.WaitOne();
