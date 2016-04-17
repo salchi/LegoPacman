@@ -1,5 +1,4 @@
 ﻿using LegoPacman.classes;
-using LegoTest2;
 using MonoBrickFirmware.Display;
 using MonoBrickFirmware.Movement;
 using MonoBrickFirmware.Sensors;

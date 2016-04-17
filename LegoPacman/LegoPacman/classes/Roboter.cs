@@ -7,7 +7,6 @@ using MonoBrickFirmware.Sensors;
 using MonoBrickFirmware.Movement;
 using MonoBrickFirmware.Display;
 using System.Threading;
-using LegoTest2;
 
 namespace LegoPacman.classes
 {
@@ -111,19 +110,12 @@ namespace LegoPacman.classes
             LegoUtils.PrintAndWait(3, "finished moveToFence");
         }
 
-        private const int SLEEP_TIME_PER_CM = 50;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
-            int sleepTime = cm * SLEEP_TIME_PER_CM;
-            LegoUtils.PrintAndWait(3, "movecm: cm:{0} sleeping:{1}", cm, sleepTime);
-            vehicle.Forward(SPEED_MAX);
+            LegoUtils.PrintAndWait(3, "movecm: cm:{0}");
 
-            Thread.Sleep(sleepTime);
+            vehicle.Backward(SPEED_MAX, (uint)LegoUtils.CmToEngineDegrees(cm), brakeOnFinish);
 
-            if (brakeOnFinish)
-            {
-                vehicle.Brake();
-            }
             LegoUtils.PrintAndWait(3, "finished movecm");
         }
 
