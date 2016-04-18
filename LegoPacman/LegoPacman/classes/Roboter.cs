@@ -132,27 +132,29 @@ namespace LegoPacman.classes
 
         private void ForwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
         {
-            LcdConsole.WriteLine("speed: {0} deg: {1}");
+            LcdConsole.WriteLine("speed: {0} deg: {1}", speed, degrees);
             WaitHandle handle = vehicle.Backward(speed, degrees, brakeOnFinish);
             LcdConsole.WriteLine("made handle, started");
             handle.WaitOne();
             LcdConsole.WriteLine("handle waited");
         }
 
-        private const int SLOW_THRESHOLD_IN_CM = 1;
+        private const int SLOW_THRESHOLD_IN_CM = 2;
+        private const int FAST_BRAKE_ANGLE = 20;
+        private const int SLOW_BRAKE_ANGLE = 10;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
             if (cm > 2)
             {
-                uint fastDegrees = LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM);
-                uint slowDegrees = LegoUtils.CmToEngineDegrees(SLOW_THRESHOLD_IN_CM);
+                uint fastDegrees = LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM) - FAST_BRAKE_ANGLE;
+                uint slowDegrees = LegoUtils.CmToEngineDegrees(SLOW_THRESHOLD_IN_CM) - SLOW_BRAKE_ANGLE;
 
-                ForwardByDegrees(SPEED_MAX, fastDegrees);
+                ForwardByDegrees(SPEED_MAX, fastDegrees, false);
                 ForwardByDegrees(SPEED_LOW, slowDegrees);
             }
             else
             {
-                uint slowDegrees = LegoUtils.CmToEngineDegrees(cm);
+                uint slowDegrees = LegoUtils.CmToEngineDegrees(cm) - SLOW_BRAKE_ANGLE;
                 LcdConsole.WriteLine("slow deg: {0}", slowDegrees);
                 ForwardByDegrees(SPEED_LOW, slowDegrees);
             }
