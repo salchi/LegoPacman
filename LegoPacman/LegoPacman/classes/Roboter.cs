@@ -45,9 +45,13 @@ namespace LegoPacman.classes
             vehicle.SpinRight(SPEED_LOW);
 
             var startDistance = infraredSensor.Read();
-            while (getAbsDelta(startDistance, infraredSensor.Read()) < distanceDelta)
+            var delta = getAbsDelta(startDistance, infraredSensor.Read());
+
+            while (delta < distanceDelta)
             {
-                Thread.Sleep(100);
+                LcdConsole.WriteLine("delta: {0} | {1}", delta, distanceDelta);
+                delta = getAbsDelta(startDistance, infraredSensor.Read());
+                Thread.Sleep(20);
             }
 
             vehicle.Brake();
