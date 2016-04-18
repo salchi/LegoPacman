@@ -21,6 +21,17 @@ namespace LegoPacman.classes
             }
         }
 
+        public static void TestUltrasonic()
+        {
+            var sensor = new EV3UltrasonicSensor(SensorPort.In3, UltraSonicMode.Centimeter);
+            var val = sensor.Read();
+            while (val >= 1)
+            {
+                LcdConsole.WriteLine("distance: {0}", val);
+                val = sensor.Read();
+            }
+        }
+
         public static void MoveForwardByCm(int distance)
         {
             roboter.MoveForwardByCm(distance);
