@@ -18,7 +18,7 @@ namespace LegoPacman.classes
     class Roboter
     {
         private const SensorPort PORT_GYRO = SensorPort.In2;
-        private const SensorPort PORT_INFRARED = SensorPort.In3;
+        private const SensorPort PORT_ULTRASONIC = SensorPort.In3;
         private const MotorPort PORT_MOTOR_LEFT = MotorPort.OutD;
         private const MotorPort PORT_MOTOR_RIGHT = MotorPort.OutA;
  
@@ -29,14 +29,14 @@ namespace LegoPacman.classes
         private const int SPEED_LOW = 15;
 
         private EV3GyroSensor gyroSensor;
-        private EV3IRSensor infraredSensor;
+        private EV3UltrasonicSensor ultrasonicSensor;
         private Vehicle vehicle;
 
         public Roboter()
         {
             gyroSensor = new EV3GyroSensor(PORT_GYRO, GyroMode.Angle);
             gyroSensor.Reset();
-            infraredSensor = new EV3IRSensor(PORT_INFRARED, IRMode.Proximity);
+            ultrasonicSensor = new EV3UltrasonicSensor(PORT_ULTRASONIC, UltraSonicMode.Centimeter);
             vehicle = new Vehicle(PORT_MOTOR_LEFT, PORT_MOTOR_RIGHT);
         }
 
@@ -44,26 +44,26 @@ namespace LegoPacman.classes
         {
             vehicle.SpinRight(SPEED_LOW);
 
-            var startDistance = infraredSensor.Read();
-            var delta = getAbsDelta(startDistance, infraredSensor.Read());
+            var startDistance = ultrasonicSensor.Read();
+            var delta = getAbsDelta(startDistance, ultrasonicSensor.Read());
 
             while (delta < distanceDelta)
             {
                 LcdConsole.WriteLine("delta: {0} | {1}", delta, distanceDelta);
-                delta = getAbsDelta(startDistance, infraredSensor.Read());
+                delta = getAbsDelta(startDistance, ultrasonicSensor.Read());
                 Thread.Sleep(20);
             }
 
             vehicle.Brake();
 
-            return infraredSensor.ReadDistance();
+            return ultrasonicSensor.Read();
         }
 
         private const int CORRECTION = 3;
         public void AlignAlongRightSide()
         {
             LcdConsole.WriteLine("starting align");
-            var distance = infraredSensor.ReadDistance();
+            var distance = ultrasonicSensor.Read();
             LcdConsole.WriteLine("initial distance: {0}", distance);
 
             var tempDistance = RotateUntilDistanceChangesBy(3);
@@ -81,14 +81,14 @@ namespace LegoPacman.classes
             }
 
             var oldDistance = tempDistance;
-            var newDistance = infraredSensor.ReadDistance();
+            var newDistance = ultrasonicSensor.Read();
             var delta = getAbsDelta(newDistance, oldDistance);
 
             LcdConsole.WriteLine("delta {0}", delta);
 
             while (delta >= 1)
             {
-                newDistance = infraredSensor.ReadDistance();
+                newDistance = ultrasonicSensor.Read();
                 oldDistance = newDistance;
                 delta = getAbsDelta(newDistance, oldDistance);
                 LcdConsole.WriteLine("old: {0} new: {1} delta: {2}", oldDistance, newDistance, delta);
@@ -108,7 +108,7 @@ namespace LegoPacman.classes
         public void MoveToFence()
         {
             LegoUtils.PrintAndWait(3, "starting align");
-            var distance = infraredSensor.ReadDistance();
+            var distance = ultrasonicSensor.Read();
             LcdConsole.WriteLine("initial distance: {0}", distance);
 
             if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_IN_CM))
@@ -124,7 +124,7 @@ namespace LegoPacman.classes
                 Rotate(ANGLE_TO_FENCE, RotationDirection.Right);
             }
 
-            distance = infraredSensor.ReadDistance();
+            distance = ultrasonicSensor.Read();
             while (distance > TARGET_FENCE_DISTANCE)
             {
                 vehicle.Forward(SPEED_INTERMEDIATE);
