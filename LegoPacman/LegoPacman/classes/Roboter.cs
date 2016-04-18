@@ -145,13 +145,14 @@ namespace LegoPacman.classes
 
         private const int SLOW_THRESHOLD_IN_CM = 3;
         private const double FAST_MOMENTUM_FACTOR = .9d;
-        private const int FAST_BRAKE_ANGLE = 20;
-        private const int SLOW_BRAKE_ANGLE = 8;
+        private const double SLOW_MOMENTUM_FACTOR = .95d;
+        private const int FAST_BRAKE_ANGLE = 15;
+        private const int SLOW_BRAKE_ANGLE = 4;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
             if (cm > SLOW_THRESHOLD_IN_CM)
             {
-                uint fastDegrees = (uint)(LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM) * FAST_MOMENTUM_FACTOR) - FAST_BRAKE_ANGLE;
+                uint fastDegrees = (uint)Math.Round((LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM) * FAST_MOMENTUM_FACTOR) - FAST_BRAKE_ANGLE);
                 uint slowDegrees = LegoUtils.CmToEngineDegrees(SLOW_THRESHOLD_IN_CM) - SLOW_BRAKE_ANGLE;
 
                 ForwardByDegrees(SPEED_MAX, fastDegrees, false);
@@ -159,7 +160,7 @@ namespace LegoPacman.classes
             }
             else
             {
-                uint slowDegrees = LegoUtils.CmToEngineDegrees(cm) - SLOW_BRAKE_ANGLE;
+                uint slowDegrees = (uint)Math.Round(LegoUtils.CmToEngineDegrees(cm) * SLOW_MOMENTUM_FACTOR) - SLOW_BRAKE_ANGLE;
                 LcdConsole.WriteLine("slow deg: {0}", slowDegrees);
                 ForwardByDegrees(SPEED_LOW, slowDegrees);
             }
