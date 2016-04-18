@@ -1,4 +1,6 @@
-﻿using System;
+﻿using MonoBrickFirmware.Display;
+using MonoBrickFirmware.Sensors;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -26,7 +28,16 @@ namespace LegoPacman.classes
 
         public static void AlignAlongRightSide()
         {
-            roboter.AlignAlongRightSide();
+            //roboter.AlignAlongRightSide();
+            var infraredSensor = new EV3IRSensor(SensorPort.In3, IRMode.Proximity);
+            var val = infraredSensor.Read();
+            while (val > 3)
+            {
+                LcdConsole.WriteLine("value {0}",val);
+                val = infraredSensor.Read();
+            }
+
+            LcdConsole.WriteLine("done {0}", infraredSensor.Read());
         }
 
         public static void MoveToFence()
