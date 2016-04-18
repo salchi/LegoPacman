@@ -28,16 +28,7 @@ namespace LegoPacman.classes
 
         public static void AlignAlongRightSide()
         {
-            //roboter.AlignAlongRightSide();
-            var infraredSensor = new EV3IRSensor(SensorPort.In3, IRMode.Proximity);
-            var val = infraredSensor.Read();
-            while (val > 3)
-            {
-                LcdConsole.WriteLine("value {0}",val);
-                val = infraredSensor.Read();
-            }
-
-            LcdConsole.WriteLine("done {0}", infraredSensor.Read());
+            roboter.AlignAlongRightSide();
         }
 
         public static void MoveToFence()
