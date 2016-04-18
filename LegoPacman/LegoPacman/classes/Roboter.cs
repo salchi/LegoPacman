@@ -143,14 +143,15 @@ namespace LegoPacman.classes
             LcdConsole.WriteLine("handle waited");
         }
 
-        private const int SLOW_THRESHOLD_IN_CM = 2;
+        private const int SLOW_THRESHOLD_IN_CM = 3;
+        private const double FAST_MOMENTUM_FACTOR = .9d;
         private const int FAST_BRAKE_ANGLE = 20;
-        private const int SLOW_BRAKE_ANGLE = 10;
+        private const int SLOW_BRAKE_ANGLE = 8;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
-            if (cm > 2)
+            if (cm > SLOW_THRESHOLD_IN_CM)
             {
-                uint fastDegrees = LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM) - FAST_BRAKE_ANGLE;
+                uint fastDegrees = (uint)(LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM) * FAST_MOMENTUM_FACTOR) - FAST_BRAKE_ANGLE;
                 uint slowDegrees = LegoUtils.CmToEngineDegrees(SLOW_THRESHOLD_IN_CM) - SLOW_BRAKE_ANGLE;
 
                 ForwardByDegrees(SPEED_MAX, fastDegrees, false);
