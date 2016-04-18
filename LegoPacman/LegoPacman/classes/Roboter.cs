@@ -40,6 +40,21 @@ namespace LegoPacman.classes
             vehicle = new Vehicle(PORT_MOTOR_LEFT, PORT_MOTOR_RIGHT);
         }
 
+        private int RotateUntilDistanceChangesBy(int distanceDelta)
+        {
+            vehicle.SpinRight(SPEED_LOW);
+
+            var startDistance = infraredSensor.Read();
+            while (getAbsDelta(startDistance, infraredSensor.Read()) < distanceDelta)
+            {
+                Thread.Sleep(100);
+            }
+
+            vehicle.Brake();
+
+            return infraredSensor.ReadDistance();
+        }
+
         private const int CORRECTION = 3;
         public void AlignAlongRightSide()
         {
@@ -47,9 +62,7 @@ namespace LegoPacman.classes
             var distance = infraredSensor.ReadDistance();
             LcdConsole.WriteLine("initial distance: {0}", distance);
 
-            Rotate(3, RotationDirection.Right);
-
-            var tempDistance = infraredSensor.ReadDistance();
+            var tempDistance = RotateUntilDistanceChangesBy(3);
             LcdConsole.WriteLine("second distance: {0}", tempDistance);
 
             var rotationDirection = RotationDirection.Right;
@@ -63,16 +76,18 @@ namespace LegoPacman.classes
                 vehicle.SpinRight(SPEED_LOW);
             }
 
-            var distanceDelta = 0;
-            var oldDistance = infraredSensor.ReadDistance();
-            int newDistance;
+            var oldDistance = tempDistance;
+            var newDistance = infraredSensor.ReadDistance();
+            var delta = getAbsDelta(newDistance, oldDistance);
 
-            while (distanceDelta <= 0)
+            LcdConsole.WriteLine("delta {0}", delta);
+
+            while (delta >= 1)
             {
                 newDistance = infraredSensor.ReadDistance();
-                distanceDelta = newDistance - oldDistance;
-                LcdConsole.WriteLine("old: {0} new: {1} delta: {2}", oldDistance, newDistance, distanceDelta);
                 oldDistance = newDistance;
+                delta = getAbsDelta(newDistance, oldDistance);
+                LcdConsole.WriteLine("old: {0} new: {1} delta: {2}", oldDistance, newDistance, delta);
             }
 
             vehicle.Brake();
@@ -160,9 +175,9 @@ namespace LegoPacman.classes
             return getAbsDelta(currentAngle, targetAngle) <= BOUND_STOP_SPINNING;
         }
 
-        private int getAbsDelta(int currentAngle, int targetAngle)
+        private int getAbsDelta(int number1, int number2)
         {
-            return Math.Abs(currentAngle - targetAngle);
+            return Math.Abs(number1 - number2);
         }
 
         private sbyte GetRotatingSpeed(int delta)
