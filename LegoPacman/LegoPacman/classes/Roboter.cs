@@ -88,22 +88,20 @@ namespace LegoPacman.classes
         }
 
         // in cm
-        private const int FAST_DISTANCE_IN_CM = 10;
         private const int IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM = 3;
         private const int TURNING_BUFFER_IN_CM = 2;
         private const int ANGLE_TO_FENCE = 45;
         private const int TARGET_FENCE_DISTANCE = 2;
         public void MoveToFence()
         {
-            LegoUtils.PrintAndWait(3, "starting align");
             var distance = LegoUtils.DoubleToInt(readDistanceInCm());
-            LcdConsole.WriteLine("initial distance: {0}", distance);
+            LegoUtils.PrintAndWait(2, "initial distance: {0}", distance);
 
             int distanceToFence = distance - IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM - TURNING_BUFFER_IN_CM;
             LcdConsole.WriteLine("fence drice distance: {0}", distanceToFence);
 
             Rotate(90, RotationDirection.Right);
-            MoveForwardByCm(distance - IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM, false);
+            MoveForwardByCm(distanceToFence, false);
             Rotate(90 - ANGLE_TO_FENCE, RotationDirection.Left);
             MoveForwardByCm(IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM + TURNING_BUFFER_IN_CM);
             
@@ -114,11 +112,8 @@ namespace LegoPacman.classes
 
         private void ForwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
         {
-            LcdConsole.WriteLine("speed: {0} deg: {1}", speed, degrees);
             WaitHandle handle = vehicle.Backward(speed, degrees, brakeOnFinish);
-            LcdConsole.WriteLine("made handle, started");
             handle.WaitOne();
-            LcdConsole.WriteLine("handle waited");
         }
 
         private const int SLOW_THRESHOLD_IN_CM = 3;
