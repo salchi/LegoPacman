@@ -11,14 +11,14 @@ namespace LegoPacman.classes
 {
     public class ColorAnalyzer
     {
-        public ConcurrentBag<KnownColor> ValidColors { get; }
+        public List<KnownColor> ValidColors { get; }
 
         private const double MAX_ALLOWED_SPIKE_DISTANCE = 35d;
         private const double MAX_AVG_DISTANCE = 25d;
 
         public ColorAnalyzer()
         {
-           ValidColors = new ConcurrentBag<KnownColor>();
+           ValidColors = new List<KnownColor>();
         }
         
         public KnownColor Analyze(RGBColor c)

@@ -42,6 +42,7 @@ namespace LegoPacman.classes
             vehicle = new Vehicle(PORT_MOTOR_LEFT, PORT_MOTOR_RIGHT);
             colorReader = new ColorReader(SensorPort.In4);
             colorAnalyzer = new ColorAnalyzer();
+            colorAnalyzer.ValidColors.AddRange(new List<KnownColor>() { KnownColor.Fence_temp, KnownColor.Blue });
         }
 
         private void HandleReadColor()
@@ -51,15 +52,8 @@ namespace LegoPacman.classes
 
             if (lastRead == KnownColor.Blue)
             {
-
-            }
-            else if (lastRead == KnownColor.Green)
-            {
-
-            }
-            else if (lastRead == KnownColor.Red)
-            {
-
+                Rotate(90, RotationDirection.Left);
+                MoveForwardByCm(20);
             }
             else if (lastRead == KnownColor.Invalid)
             {
