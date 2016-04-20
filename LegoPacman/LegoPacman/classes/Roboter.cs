@@ -104,7 +104,7 @@ namespace LegoPacman.classes
             LegoUtils.PrintAndWait(2, "initial distance: {0}", distance);
 
             int distanceToFence = distance - IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM - TURNING_BUFFER_IN_CM;
-            LcdConsole.WriteLine("fence drice distance: {0}", distanceToFence);
+            LcdConsole.WriteLine("fence drive distance: {0}", distanceToFence);
 
             Rotate(90, RotationDirection.Right);
             MoveForwardByCm(distanceToFence, false);
