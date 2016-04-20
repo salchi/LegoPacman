@@ -1,4 +1,5 @@
 ﻿using MonoBrickFirmware.Display;
+using MonoBrickFirmware.Movement;
 using MonoBrickFirmware.Sensors;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,22 @@ namespace LegoPacman.classes
                 LcdConsole.WriteLine("distance: {0}", val);
                 val = sensor.Read();
             }
+        }
+
+        public static void ForwardBackward()
+        {
+            var v = new Vehicle(MotorPort.OutD, MotorPort.OutA);
+            LcdConsole.WriteLine("reverseLEft {0}  reverseRight {1}", v.ReverseLeft, v.ReverseRight);
+            LcdConsole.WriteLine("forward with speed");
+            v.Forward(20);
+            LcdConsole.WriteLine("forward with degrees");
+            var handle = v.Forward(20, 400, true);
+            handle.WaitOne();
+            LcdConsole.WriteLine("backward with speed");
+            v.Backward(20);
+            LcdConsole.WriteLine("backward with degrees");
+            handle = v.Backward(20,400,true);
+            handle.WaitOne();
         }
 
         public static void MoveForwardByCm(int distance)
