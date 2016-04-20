@@ -29,7 +29,7 @@ namespace LegoPacman.classes
             foreach(var kc in ValidColors)
             {
                 var tempDistance = AverageDistance(kc, c);
-                LcdConsole.WriteLine("{0} {1} {2}", kc, tempDistance, MaxDistance(kc, c));
+                //LcdConsole.WriteLine("{0} {1} {2}", kc, tempDistance, MaxDistance(kc, c));
 
                 if (SpikeTest(kc, c) && tempDistance < currentDistance)
                 {

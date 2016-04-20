@@ -52,20 +52,24 @@ namespace LegoPacman.classes
 
             if (lastRead == KnownColor.Blue)
             {
-                LcdConsole.WriteLine("Blue found!!");
+                LcdConsole.WriteLine("got Blue!!");
                 Rotate(90, RotationDirection.Left);
                 MoveForwardByCm(20);
             }
             else if (lastRead == KnownColor.Invalid)
             {
                 LcdConsole.WriteLine("got invalid color!!");
-                vehicle.TurnRightForward(SPEED_LOW, 50, 10, true);
+                gyroSensor.Reset();
+                Rotate(10, RotationDirection.Right);
+                MoveForwardByCm(5);
+                Rotate(ReadGyro(RotationDirection.Right), RotationDirection.Left);
+                FollowFence();
             }
         }
 
         public void FollowFence()
         {
-            vehicle.Backward(SPEED_INTERMEDIATE);
+            vehicle.Forward(SPEED_INTERMEDIATE);
             colorReader.TryRead();
 
             while (colorAnalyzer.Analyze(colorReader.LastRead) == KnownColor.Fence_temp)
