@@ -146,7 +146,7 @@ namespace LegoPacman.classes
         private const int SLOW_THRESHOLD_IN_CM = 3;
         private const double FAST_MOMENTUM_FACTOR = .85d;
         private const double SLOW_MOMENTUM_FACTOR = .90d;
-        private const int FAST_BRAKE_ANGLE = 18;
+        private const int FAST_BRAKE_ANGLE = 15;
         private const int SLOW_BRAKE_ANGLE = 2;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
