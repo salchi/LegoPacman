@@ -111,7 +111,7 @@ namespace LegoPacman.classes
             //Rotate(90 - ANGLE_TO_FENCE, RotationDirection.Left);
             //MoveForwardByCm(IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM + TURNING_BUFFER_IN_CM);
 
-            WaitHandle handle = vehicle.TurnLeftForward(SPEED_INTERMEDIATE, 50, LegoUtils.CmToEngineDegrees(IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM + TURNING_BUFFER_IN_CM), true);
+            WaitHandle handle = vehicle.TurnRightReverse(SPEED_INTERMEDIATE, 100, LegoUtils.CmToEngineDegrees(IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM + TURNING_BUFFER_IN_CM), true);
             handle.WaitOne();
 
             Rotate(ANGLE_TO_FENCE, RotationDirection.Left);
