@@ -94,7 +94,6 @@ namespace LegoPacman.classes
         private const int IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM = 3;
         private const int TURNING_BUFFER_IN_CM = 3;
         private const int ANGLE_TO_FENCE = 45;
-        private const int TARGET_FENCE_DISTANCE = 2;
         public void MoveToFence()
         {
             var distance = LegoUtils.DoubleToInt(readDistanceInCm());
@@ -108,7 +107,8 @@ namespace LegoPacman.classes
             //Rotate(90 - ANGLE_TO_FENCE, RotationDirection.Left);
             //MoveForwardByCm(IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM + TURNING_BUFFER_IN_CM);
 
-            vehicle.TurnLeftForward(SPEED_INTERMEDIATE, 50, LegoUtils.CmToEngineDegrees(6), true);
+            WaitHandle handle = vehicle.TurnLeftForward(SPEED_INTERMEDIATE, 50, LegoUtils.CmToEngineDegrees(IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM + TURNING_BUFFER_IN_CM), true);
+            handle.WaitOne();
 
             Rotate(ANGLE_TO_FENCE, RotationDirection.Left);
             LegoUtils.PrintAndWait(3, "finished moveToFence");
@@ -116,6 +116,7 @@ namespace LegoPacman.classes
 
         private void ForwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
         {
+            LcdConsole.WriteLine("moving forward: speed {0} deg {1} brake {2}", speed, degrees, brakeOnFinish);
             WaitHandle handle = vehicle.Backward(speed, degrees, brakeOnFinish);
             handle.WaitOne();
         }
@@ -129,7 +130,9 @@ namespace LegoPacman.classes
         {
             if (cm > SLOW_THRESHOLD_IN_CM)
             {
-                uint fastDegrees = (uint)Math.Round((LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM) * FAST_MOMENTUM_FACTOR) - FAST_BRAKE_ANGLE);
+                uint cmCalcDeg = LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM);
+                LcdConsole.WriteLine("cmcalcdeg {0}", cmCalcDeg);
+                uint fastDegrees = (uint)Math.Round((cmCalcDeg * FAST_MOMENTUM_FACTOR) - FAST_BRAKE_ANGLE);
                 uint slowDegrees = LegoUtils.CmToEngineDegrees(SLOW_THRESHOLD_IN_CM) - SLOW_BRAKE_ANGLE;
 
                 LcdConsole.WriteLine("fastdeg: {0} slowdeg:{1}", fastDegrees, slowDegrees);
