@@ -31,6 +31,8 @@ namespace LegoPacman.classes
         private EV3GyroSensor gyroSensor;
         private EV3UltrasonicSensor ultrasonicSensor;
         private Vehicle vehicle;
+        private ColorReader colorReader;
+        private ColorAnalyzer colorAnalyzer;
 
         public Roboter()
         {
@@ -38,11 +40,43 @@ namespace LegoPacman.classes
             gyroSensor.Reset();
             ultrasonicSensor = new EV3UltrasonicSensor(PORT_ULTRASONIC, UltraSonicMode.Centimeter);
             vehicle = new Vehicle(PORT_MOTOR_LEFT, PORT_MOTOR_RIGHT);
+            colorReader = new ColorReader(SensorPort.In4);
+            colorAnalyzer = new ColorAnalyzer();
+        }
+
+        private void HandleReadColor()
+        {
+            var lastRead = colorAnalyzer.Analyze(colorReader.LastRead);
+            LcdConsole.WriteLine(lastRead.Name);
+
+            if (lastRead == KnownColor.Blue)
+            {
+
+            }
+            else if (lastRead == KnownColor.Green)
+            {
+
+            }
+            else if (lastRead == KnownColor.Red)
+            {
+
+            }
+            else if (lastRead == KnownColor.Invalid)
+            {
+                vehicle.TurnRightForward(SPEED_LOW, 50, 10, true);
+            }
         }
 
         public void FollowFence()
         {
-
+            colorReader.TryRead();
+            while (colorAnalyzer.Analyze(colorReader.LastRead) == KnownColor.Fence_temp)
+            {
+                colorReader.TryRead();
+                vehicle.Backward(SPEED_INTERMEDIATE);
+            }
+            vehicle.Brake();
+            HandleReadColor();
         }
 
         private const int MAX_TRIES = 100;

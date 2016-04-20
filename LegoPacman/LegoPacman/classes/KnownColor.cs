@@ -13,6 +13,7 @@ namespace LegoPacman.classes
         public static readonly KnownColor Red = new KnownColor("Red", new RGBColor(255, 0, 0));
         public static readonly KnownColor Green = new KnownColor("Green", new RGBColor(0, 255, 0));
         public static readonly KnownColor Blue = new KnownColor("Blue", new RGBColor(0, 0, 255));
+        public static readonly KnownColor Fence_temp = new KnownColor("Fence", new RGBColor(100, 100, 100));
         public static readonly List<KnownColor> AllValid = new List<KnownColor> { Red, Green, Blue };
 
         public string Name { get; }
