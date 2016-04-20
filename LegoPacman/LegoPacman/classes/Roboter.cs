@@ -19,6 +19,7 @@ namespace LegoPacman.classes
     {
         private const SensorPort PORT_GYRO = SensorPort.In2;
         private const SensorPort PORT_ULTRASONIC = SensorPort.In3;
+        private const SensorPort PORT_COLOR = SensorPort.In4;
         private const MotorPort PORT_MOTOR_LEFT = MotorPort.OutD;
         private const MotorPort PORT_MOTOR_RIGHT = MotorPort.OutA;
  
@@ -40,7 +41,7 @@ namespace LegoPacman.classes
             gyroSensor.Reset();
             ultrasonicSensor = new EV3UltrasonicSensor(PORT_ULTRASONIC, UltraSonicMode.Centimeter);
             vehicle = new Vehicle(PORT_MOTOR_LEFT, PORT_MOTOR_RIGHT);
-            colorReader = new ColorReader(SensorPort.In4);
+            colorReader = new ColorReader(PORT_COLOR);
             colorAnalyzer = new ColorAnalyzer();
             colorAnalyzer.ValidColors.AddRange(new List<KnownColor>() { KnownColor.Fence_temp, KnownColor.Blue });
         }
