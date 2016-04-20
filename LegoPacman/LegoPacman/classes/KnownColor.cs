@@ -11,7 +11,7 @@ namespace LegoPacman.classes
     {
         public static readonly KnownColor Invalid = new KnownColor("Invalid", new RGBColor(0, 0, 0));
         public static readonly KnownColor Fence_temp = new KnownColor("Fence", new RGBColor(20, 30, 15));
-        public static readonly KnownColor Blue = new KnownColor("Fence", new RGBColor(26, 83, 93));
+        public static readonly KnownColor Blue = new KnownColor("Blue", new RGBColor(26, 83, 93));
 
         public string Name { get; }
         public RGBColor TargetColor { get; }
