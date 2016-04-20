@@ -63,11 +63,12 @@ namespace LegoPacman.classes
 
         public void FollowFence()
         {
+            vehicle.Backward(SPEED_INTERMEDIATE);
             colorReader.TryRead();
+
             while (colorAnalyzer.Analyze(colorReader.LastRead) == KnownColor.Fence_temp)
             {
-                colorReader.TryRead();
-                vehicle.Backward(SPEED_INTERMEDIATE);
+                colorReader.TryRead();                
             }
             vehicle.Brake();
             HandleReadColor();

@@ -26,7 +26,7 @@ namespace LegoPacman
 
             LcdConsole.WriteLine("up: Rotation");
             LcdConsole.WriteLine("left: MoveForwardByCm");
-            LcdConsole.WriteLine("right: movetofence");
+            LcdConsole.WriteLine("right: FollowFence");
             LcdConsole.WriteLine("down: MoveToFence");
 
             buttonEvents.EnterPressed += () =>
@@ -34,7 +34,7 @@ namespace LegoPacman
                 LcdConsole.Clear();
                 LcdConsole.WriteLine("up: Rotation");
                 LcdConsole.WriteLine("left: MoveForwardByCm");
-                LcdConsole.WriteLine("right: ");
+                LcdConsole.WriteLine("right: FollowFence");
                 LcdConsole.WriteLine("down: MoveToFence");
             };
 
@@ -64,7 +64,9 @@ namespace LegoPacman
 
             buttonEvents.RightPressed += () =>
             {
-
+                LegoUtils.PrintAndWait(2, "starting FollowFence");
+                RoboTest.FollowFence();
+                LegoUtils.PrintAndWait(2, "FollowFence done");
             };
 
             buttonEvents.DownPressed += () =>

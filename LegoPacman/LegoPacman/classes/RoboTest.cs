@@ -12,6 +12,11 @@ namespace LegoPacman.classes
     {
         private static Roboter roboter = new Roboter();
 
+        public static void FollowFence()
+        {
+            roboter.FollowFence();
+        }
+
         public static void Rotation(int start, int end, int step)
         {
             for (int i = start; i <= end; i += step)
