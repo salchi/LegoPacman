@@ -21,6 +21,11 @@ namespace LegoPacman.classes
             LcdConsole.WriteLine(content);
         }
 
+        public static int DoubleToInt(double number)
+        {
+            return (int)Math.Round(number);
+        }
+
         public static void PrintAndWait(int durationInSeconds, string s, params object[] objects)
         {
             LcdConsole.WriteLine(s, objects);

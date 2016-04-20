@@ -40,8 +40,13 @@ namespace LegoPacman.classes
             vehicle = new Vehicle(PORT_MOTOR_LEFT, PORT_MOTOR_RIGHT);
         }
 
+        public void FollowFence()
+        {
+
+        }
+
         private const int MAX_TRIES = 100;
-        private int readDistanceInCm()
+        private double readDistanceInCm()
         {
             var val = ultrasonicSensor.Read();
             var tries = 0;
@@ -51,7 +56,7 @@ namespace LegoPacman.classes
                 tries++;
                 Thread.Sleep(20);
             }
-            return (int)Math.Round(Convert.ToDouble(val / 10));
+            return val / 10;
         }
 
         // in cm
@@ -63,7 +68,7 @@ namespace LegoPacman.classes
         public void MoveToFence()
         {
             LegoUtils.PrintAndWait(3, "starting align");
-            var distance = readDistanceInCm();
+            var distance = LegoUtils.DoubleToInt(readDistanceInCm());
             LcdConsole.WriteLine("initial distance: {0}", distance);
 
             if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_IN_CM))
@@ -79,7 +84,7 @@ namespace LegoPacman.classes
                 Rotate(ANGLE_TO_FENCE, RotationDirection.Right);
             }
 
-            distance = readDistanceInCm();
+            distance = LegoUtils.DoubleToInt(readDistanceInCm());
             while (distance > TARGET_FENCE_DISTANCE)
             {
                 vehicle.Forward(SPEED_INTERMEDIATE);
