@@ -37,11 +37,6 @@ namespace LegoPacman.classes
             roboter.MoveForwardByCm(distance);
         }
 
-        public static void AlignAlongRightSide()
-        {
-            roboter.AlignAlongRightSide();
-        }
-
         public static void MoveToFence()
         {
             roboter.MoveToFence();

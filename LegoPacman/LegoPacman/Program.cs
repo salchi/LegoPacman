@@ -26,7 +26,7 @@ namespace LegoPacman
 
             LcdConsole.WriteLine("up: Rotation");
             LcdConsole.WriteLine("left: MoveForwardByCm");
-            LcdConsole.WriteLine("right: AlignAlongRightSide");
+            LcdConsole.WriteLine("right: ");
             LcdConsole.WriteLine("down: MoveToFence");
 
             buttonEvents.EnterPressed += () =>
@@ -34,7 +34,7 @@ namespace LegoPacman
                 LcdConsole.Clear();
                 LcdConsole.WriteLine("up: Rotation");
                 LcdConsole.WriteLine("left: MoveForwardByCm");
-                LcdConsole.WriteLine("right: AlignAlongRightSide");
+                LcdConsole.WriteLine("right: ");
                 LcdConsole.WriteLine("down: MoveToFence");
             };
 
@@ -62,9 +62,6 @@ namespace LegoPacman
             };
             buttonEvents.RightPressed += () =>
             {
-                LegoUtils.PrintAndWait(2, "starting AlignAlongRightSide");
-                RoboTest.AlignAlongRightSide();
-                LegoUtils.PrintAndWait(2, "PrintAndWait done");
             };
             buttonEvents.DownPressed += () =>
             {
