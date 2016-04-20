@@ -130,6 +130,8 @@ namespace LegoPacman.classes
                 uint fastDegrees = (uint)Math.Round((LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM) * FAST_MOMENTUM_FACTOR) - FAST_BRAKE_ANGLE);
                 uint slowDegrees = LegoUtils.CmToEngineDegrees(SLOW_THRESHOLD_IN_CM) - SLOW_BRAKE_ANGLE;
 
+                LegoUtils.PrintAndWait(8, "fastdeg: {0} slowdeg:{1}", fastDegrees, slowDegrees);
+
                 ForwardByDegrees(SPEED_MAX, fastDegrees, false);
                 ForwardByDegrees(SPEED_LOW, slowDegrees);
             }
