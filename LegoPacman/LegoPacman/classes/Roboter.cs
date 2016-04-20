@@ -61,7 +61,7 @@ namespace LegoPacman.classes
 
         // in cm
         private const int FAST_DISTANCE_IN_CM = 20;
-        private const int IR_TO_FRONT_IN_CM = 18;
+        private const int IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM = 3;
         private const int SLOW_DISTANCE_IN_CM = 5;
         private const int ANGLE_TO_FENCE = 10;
         private const int TARGET_FENCE_DISTANCE = 2;
@@ -71,11 +71,11 @@ namespace LegoPacman.classes
             var distance = LegoUtils.DoubleToInt(readDistanceInCm());
             LcdConsole.WriteLine("initial distance: {0}", distance);
 
-            if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_IN_CM))
+            if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM))
             {
-                LegoUtils.PrintAndWait(3, "fast, distance = {0}", distance - IR_TO_FRONT_IN_CM - SLOW_DISTANCE_IN_CM);
+                LegoUtils.PrintAndWait(3, "fast, distance = {0}", distance - IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM - SLOW_DISTANCE_IN_CM);
                 Rotate(90, RotationDirection.Left);
-                MoveForwardByCm(distance - IR_TO_FRONT_IN_CM - SLOW_DISTANCE_IN_CM);
+                MoveForwardByCm(distance - IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM - SLOW_DISTANCE_IN_CM);
                 Rotate(90 - ANGLE_TO_FENCE, RotationDirection.Left);
             }
             else
