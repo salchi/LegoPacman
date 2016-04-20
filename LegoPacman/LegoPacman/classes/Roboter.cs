@@ -49,15 +49,16 @@ namespace LegoPacman.classes
         private void HandleReadColor()
         {
             var lastRead = colorAnalyzer.Analyze(colorReader.LastRead);
-            LcdConsole.WriteLine(lastRead.Name);
 
             if (lastRead == KnownColor.Blue)
             {
+                LcdConsole.WriteLine("Blue found!!");
                 Rotate(90, RotationDirection.Left);
                 MoveForwardByCm(20);
             }
             else if (lastRead == KnownColor.Invalid)
             {
+                LcdConsole.WriteLine("got invalid color!!");
                 vehicle.TurnRightForward(SPEED_LOW, 50, 10, true);
             }
         }
