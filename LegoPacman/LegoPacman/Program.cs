@@ -13,11 +13,7 @@ using System.Threading.Tasks;
 namespace LegoPacman
 {
     class Program
-    {
-        private static Roboter roboter;
-
-        public static object LegoUtil { get; private set; }
-
+    {   
         static void Main(string[] args)
         {
             var terminateProgram = new ManualResetEvent(false);

@@ -40,63 +40,93 @@ namespace LegoPacman.classes
             vehicle = new Vehicle(PORT_MOTOR_LEFT, PORT_MOTOR_RIGHT);
         }
 
+        private const int MAX_TRIES = 100;
+        private int readDistanceInCm()
+        {
+            var val = ultrasonicSensor.Read();
+            var tries = 0;
+            while (val == 0 && tries < MAX_TRIES)
+            {
+                val = ultrasonicSensor.Read();
+                tries++;
+                Thread.Sleep(20);
+            }
+            return (int)Math.Round(Convert.ToDouble(val / 10));
+        }
+
         private int RotateUntilDistanceChangesBy(int distanceDelta)
         {
             vehicle.SpinRight(SPEED_LOW);
 
-            var startDistance = ultrasonicSensor.Read();
-            var delta = getAbsDelta(startDistance, ultrasonicSensor.Read());
+            var startDistance = readDistanceInCm();
+            var delta = getAbsDelta(startDistance, readDistanceInCm());
 
             while (delta < distanceDelta)
             {
-                LcdConsole.WriteLine("delta: {0} | {1}", delta, distanceDelta);
-                delta = getAbsDelta(startDistance, ultrasonicSensor.Read());
-                Thread.Sleep(20);
+                delta = getAbsDelta(startDistance, readDistanceInCm());
             }
 
             vehicle.Brake();
+            var endDistance = readDistanceInCm();
+            LcdConsole.WriteLine("rotateUntil start {0} end {1}", startDistance, endDistance);
 
-            return ultrasonicSensor.Read();
+            return endDistance;
         }
 
-        private const int CORRECTION = 3;
+        private const int CORRECTION = 2;
         public void AlignAlongRightSide()
         {
             LcdConsole.WriteLine("starting align");
-            var distance = ultrasonicSensor.Read();
+            var distance = readDistanceInCm();
             LcdConsole.WriteLine("initial distance: {0}", distance);
 
-            var tempDistance = RotateUntilDistanceChangesBy(3);
+            var tempDistance = RotateUntilDistanceChangesBy(2);
             LcdConsole.WriteLine("second distance: {0}", tempDistance);
+            Thread.Sleep(2000);
 
             var rotationDirection = RotationDirection.Right;
             if (tempDistance > distance)
             {
+                LcdConsole.WriteLine("spinning left");
                 vehicle.SpinLeft(SPEED_LOW);
                 rotationDirection = RotationDirection.Left;
             }
             else
             {
+                LcdConsole.WriteLine("spinning right");
                 vehicle.SpinRight(SPEED_LOW);
             }
 
-            var oldDistance = tempDistance;
-            var newDistance = ultrasonicSensor.Read();
-            var delta = getAbsDelta(newDistance, oldDistance);
+            var oldDistance = distance;
+            var newDistance = readDistanceInCm();
+            var delta = newDistance - oldDistance;
 
-            LcdConsole.WriteLine("delta {0}", delta);
+            LcdConsole.WriteLine("old {0} new {1} delta {2}", oldDistance, newDistance, delta);
 
-            while (delta >= 1)
+            if (rotationDirection == RotationDirection.Left)
             {
-                newDistance = ultrasonicSensor.Read();
-                oldDistance = newDistance;
-                delta = getAbsDelta(newDistance, oldDistance);
-                LcdConsole.WriteLine("old: {0} new: {1} delta: {2}", oldDistance, newDistance, delta);
+                while (delta >= 1 && oldDistance == newDistance)
+                {
+                    oldDistance = newDistance;
+                    newDistance = readDistanceInCm();
+                    delta = newDistance - oldDistance;
+                    LcdConsole.WriteLine("old: {0} new: {1} delta: {2}", oldDistance, newDistance, delta);
+                }
+            }
+            else
+            {
+                while (delta <= 0 && oldDistance == newDistance)
+                {
+                    oldDistance = newDistance;
+                    newDistance = readDistanceInCm();
+                    delta = newDistance - oldDistance;
+                    LcdConsole.WriteLine("old: {0} new: {1} delta: {2}", oldDistance, newDistance, delta);
+                }
             }
 
             vehicle.Brake();
-            LcdConsole.WriteLine("align finished");
             Rotate(CORRECTION, (rotationDirection == RotationDirection.Left) ? RotationDirection.Right : RotationDirection.Left);
+            LcdConsole.WriteLine("align finished");
         }
 
         // in cm
@@ -108,7 +138,7 @@ namespace LegoPacman.classes
         public void MoveToFence()
         {
             LegoUtils.PrintAndWait(3, "starting align");
-            var distance = ultrasonicSensor.Read();
+            var distance = readDistanceInCm();
             LcdConsole.WriteLine("initial distance: {0}", distance);
 
             if (distance >= (FAST_DISTANCE_IN_CM + IR_TO_FRONT_IN_CM))
@@ -124,7 +154,7 @@ namespace LegoPacman.classes
                 Rotate(ANGLE_TO_FENCE, RotationDirection.Right);
             }
 
-            distance = ultrasonicSensor.Read();
+            distance = readDistanceInCm();
             while (distance > TARGET_FENCE_DISTANCE)
             {
                 vehicle.Forward(SPEED_INTERMEDIATE);
