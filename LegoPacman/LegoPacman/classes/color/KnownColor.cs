@@ -14,17 +14,17 @@ namespace LegoPacman.classes
         public static readonly KnownColor Blue = new KnownColor("Blue", new RGBColor(26, 83, 93));
 
         public string Name { get; }
-        public RGBColor TargetColor { get; }
+        public RGBColor RgbDefinition { get; }
 
-        public KnownColor(string name, RGBColor targetColor)
+        public KnownColor(string name, RGBColor definition)
         {
             Name = name;
-            TargetColor = targetColor;
+            RgbDefinition = definition;
         }
 
         public override string ToString()
         {
-            return String.Format("KC({0}, {1})", Name, RGBColorHelper.ToString(TargetColor));
+            return String.Format("KC({0}, {1})", Name, RGBColorHelper.ToString(RgbDefinition));
         }
     }
 }

@@ -12,38 +12,73 @@ namespace LegoPacman.classes
 {
     enum RotationDirection
     {
-        Left,Right
+        Left, Right
+    }
+
+    static class Velocity
+    {
+        public const int Highest = 100;
+        public const int High = 75;
+        public const int Medium = 50;
+        public const int Low = 35;
+        public const int Lowest = 10;
     }
 
     class Roboter
     {
-        private const SensorPort PORT_GYRO = SensorPort.In2;
-        private const SensorPort PORT_ULTRASONIC = SensorPort.In3;
-        private const SensorPort PORT_COLOR = SensorPort.In4;
-        private const MotorPort PORT_MOTOR_LEFT = MotorPort.OutD;
-        private const MotorPort PORT_MOTOR_RIGHT = MotorPort.OutA;
- 
-        private const int BOUND_REDUCE_SPEED = 10;
-        private const int BOUND_STOP_SPINNING = 2;
-        private const int SPEED_MAX = 100;
-        private const int SPEED_INTERMEDIATE = 50;
-        private const int SPEED_LOW = 15;
+        private const SensorPort PortGyro = SensorPort.In2;
+        private const SensorPort PortUltrasonic = SensorPort.In3;
+        private const SensorPort PortColor = SensorPort.In4;
+        private const MotorPort PortMotorLeft = MotorPort.OutD;
+        private const MotorPort PortMotorRight = MotorPort.OutA;
 
-        private EV3GyroSensor gyroSensor;
-        private EV3UltrasonicSensor ultrasonicSensor;
-        private Vehicle vehicle;
-        private ColorReader colorReader;
-        private ColorAnalyzer colorAnalyzer;
+        private EV3GyroSensor gyroSensor = new EV3GyroSensor(PortGyro, GyroMode.Angle);
+        private EV3UltrasonicSensor ultrasonicSensor = new EV3UltrasonicSensor(PortUltrasonic, UltraSonicMode.Centimeter);
+        
+        private ColorReader colorReader = new ColorReader(PortColor);
+        private ColorAnalyzer colorAnalyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.Fence_temp, KnownColor.Blue });
 
-        public Roboter()
+        private Vehicle vehicle = new Vehicle(PortMotorLeft, PortMotorRight);
+
+        private void ForwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
         {
-            gyroSensor = new EV3GyroSensor(PORT_GYRO, GyroMode.Angle);
-            gyroSensor.Reset();
-            ultrasonicSensor = new EV3UltrasonicSensor(PORT_ULTRASONIC, UltraSonicMode.Centimeter);
-            vehicle = new Vehicle(PORT_MOTOR_LEFT, PORT_MOTOR_RIGHT);
-            colorReader = new ColorReader(PORT_COLOR);
-            colorAnalyzer = new ColorAnalyzer();
-            colorAnalyzer.ValidColors.AddRange(new List<KnownColor>() { KnownColor.Fence_temp, KnownColor.Blue });
+            LcdConsole.WriteLine("moving forward: speed {0} deg {1} brake {2}", speed, degrees, brakeOnFinish);
+            LegoUtils.WaitOnHandle(vehicle.Backward(speed, degrees, brakeOnFinish));
+        }
+
+        private void BackwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
+        {
+            LcdConsole.WriteLine("moving backward: speed {0} deg {1} brake {2}", speed, degrees, brakeOnFinish);
+            LegoUtils.WaitOnHandle(vehicle.Forward(speed, degrees, brakeOnFinish));
+        }
+
+        private void MoveForward(sbyte speed)
+        {
+            vehicle.Backward(speed);
+        }
+
+        private void MoveBackward(sbyte speed)
+        {
+            vehicle.Forward(speed);
+        }
+
+        private const int MaxTries = 100;
+        // the ultrasonic sensor seemingly returns the distance in millimeters
+        private const double MmToCmFactor = 0.1d;
+        private double ReadDistanceInCm()
+        {
+            var val = ultrasonicSensor.Read();
+            var tries = 0;
+            while (val == 0 && tries < MaxTries)
+            {
+                val = ultrasonicSensor.Read();
+                tries++;
+                Thread.Sleep(20);
+            }
+
+            LcdConsole.WriteLine("read dist {0}, {1} tries", val * MmToCmFactor);
+
+            return val * MmToCmFactor;
         }
 
         private void HandleReadColor()
@@ -53,102 +88,79 @@ namespace LegoPacman.classes
             if (lastRead == KnownColor.Blue)
             {
                 LcdConsole.WriteLine("got Blue!!");
-                Rotate(90, RotationDirection.Left);
+                RotateLeft(90);
                 MoveForwardByCm(20);
             }
             else if (lastRead == KnownColor.Invalid)
             {
                 LcdConsole.WriteLine("got invalid color!!");
-                gyroSensor.Reset();
-                Rotate(10, RotationDirection.Right);
+                RotateRight(10);
                 MoveForwardByCm(5);
-                Rotate(ReadGyro(RotationDirection.Right), RotationDirection.Left);
+                RotateLeft(ReadGyro(RotationDirection.Right));
                 FollowFence();
             }
         }
 
         public void FollowFence()
         {
-            vehicle.Forward(SPEED_INTERMEDIATE);
+            MoveForward(Velocity.Medium);
             colorReader.TryRead();
 
             while (colorAnalyzer.Analyze(colorReader.LastRead) == KnownColor.Fence_temp)
             {
                 colorReader.TryRead();                
             }
+
             vehicle.Brake();
             HandleReadColor();
         }
 
-        private const int MAX_TRIES = 100;
-        private double readDistanceInCm()
-        {
-            var val = ultrasonicSensor.Read();
-            var tries = 0;
-            while (val == 0 && tries < MAX_TRIES)
-            {
-                val = ultrasonicSensor.Read();
-                tries++;
-                Thread.Sleep(20);
-            }
-            return val / 10;
-        }
-
         // in cm
-        private const int IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM = 3;
-        private const int TURNING_BUFFER_IN_CM = 3;
-        private const int ANGLE_TO_FENCE = 45;
+        private const int IrSensorFrontCenterDifference = 3;
+        private const int TurningBuffer = 3;
+        private const int AngleToFence = 45;
         public void MoveToFence()
         {
-            var distance = LegoUtils.DoubleToInt(readDistanceInCm());
+            var distance = LegoMath.DoubleToInt(ReadDistanceInCm());
             LegoUtils.PrintAndWait(2, "initial distance: {0}", distance);
 
-            int distanceToFence = distance - IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM - TURNING_BUFFER_IN_CM;
+            int distanceToFence = distance - IrSensorFrontCenterDifference - TurningBuffer;
             LcdConsole.WriteLine("fence drive distance: {0}", distanceToFence);
 
-            Rotate(90, RotationDirection.Right);
+            RotateRight(90);
             MoveForwardByCm(distanceToFence, false);
-            //Rotate(90 - ANGLE_TO_FENCE, RotationDirection.Left);
-            //MoveForwardByCm(IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM + TURNING_BUFFER_IN_CM);
 
-            WaitHandle handle = vehicle.TurnRightReverse(SPEED_INTERMEDIATE, 100, LegoUtils.CmToEngineDegrees(IR_TO_FRONT_CENTER_DIFFERENCE_IN_CM + TURNING_BUFFER_IN_CM), true);
-            handle.WaitOne();
+            LegoUtils.WaitOnHandle(vehicle.TurnRightReverse(Velocity.Medium, 100, LegoMath.CmToEngineDegrees(IrSensorFrontCenterDifference + TurningBuffer), true));
 
-            Rotate(ANGLE_TO_FENCE, RotationDirection.Left);
+            RotateLeft(AngleToFence);
             LegoUtils.PrintAndWait(3, "finished moveToFence");
         }
 
-        private void ForwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
-        {
-            LcdConsole.WriteLine("moving forward: speed {0} deg {1} brake {2}", speed, degrees, brakeOnFinish);
-            WaitHandle handle = vehicle.Backward(speed, degrees, brakeOnFinish);
-            handle.WaitOne();
-        }
-
-        private const int SLOW_THRESHOLD_IN_CM = 3;
-        private const double FAST_MOMENTUM_FACTOR = .85d;
-        private const double SLOW_MOMENTUM_FACTOR = .90d;
-        private const int FAST_BRAKE_ANGLE = 15;
-        private const int SLOW_BRAKE_ANGLE = 2;
+        // in cm
+        private const int SlowThresholdDistance = 3;
+        private const double FastMomentumFactor = .85d;
+        private const double SlowMomentumFactor = .90d;
+        private const int FastBrakeAngle = 15;
+        private const int SlowBrakeDistance = 2;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
-            if (cm > SLOW_THRESHOLD_IN_CM)
+            if (cm > SlowThresholdDistance)
             {
-                uint cmCalcDeg = LegoUtils.CmToEngineDegrees(cm - SLOW_THRESHOLD_IN_CM);
-                LcdConsole.WriteLine("cmcalcdeg {0}", cmCalcDeg);
-                uint fastDegrees = (uint)Math.Round((cmCalcDeg * FAST_MOMENTUM_FACTOR) - FAST_BRAKE_ANGLE);
-                uint slowDegrees = LegoUtils.CmToEngineDegrees(SLOW_THRESHOLD_IN_CM) - SLOW_BRAKE_ANGLE;
+                uint cmCalcDeg = LegoMath.CmToEngineDegrees(cm - SlowThresholdDistance);
+  
+                uint fastDegrees = (uint)Math.Round((cmCalcDeg * FastMomentumFactor) - FastBrakeAngle);
+                uint slowDegrees = LegoMath.CmToEngineDegrees(SlowThresholdDistance) - SlowBrakeDistance;
 
                 LcdConsole.WriteLine("fastdeg: {0} slowdeg:{1}", fastDegrees, slowDegrees);
 
-                ForwardByDegrees(SPEED_MAX, fastDegrees, false);
-                ForwardByDegrees(SPEED_LOW, slowDegrees);
+                ForwardByDegrees(Velocity.Highest, fastDegrees, false);
+                ForwardByDegrees(Velocity.Lowest, slowDegrees);
             }
             else
             {
-                uint slowDegrees = (uint)Math.Round(LegoUtils.CmToEngineDegrees(cm) * SLOW_MOMENTUM_FACTOR) - SLOW_BRAKE_ANGLE;
+                uint slowDegrees = (uint)Math.Round(LegoMath.CmToEngineDegrees(cm) * SlowMomentumFactor) - SlowBrakeDistance;
                 LcdConsole.WriteLine("slow deg: {0}", slowDegrees);
-                ForwardByDegrees(SPEED_LOW, slowDegrees);
+                ForwardByDegrees(Velocity.Lowest, slowDegrees);
             }
         }
 
@@ -164,24 +176,22 @@ namespace LegoPacman.classes
             }
         }
 
+        private const int BoundStopSpinning = 2;
         private bool NeedToStopSpinning(RotationDirection direction, int currentAngle, int targetAngle)
         {
-            return getAbsDelta(currentAngle, targetAngle) <= BOUND_STOP_SPINNING;
+            return LegoMath.AbsDelta(currentAngle, targetAngle) <= BoundStopSpinning;
         }
 
-        private int getAbsDelta(int number1, int number2)
-        {
-            return Math.Abs(number1 - number2);
-        }
 
+        private const int BoundReduceSpeed = 10;
         private sbyte GetRotatingSpeed(int delta)
         {
-            return (delta <= BOUND_REDUCE_SPEED) ? Convert.ToSByte(SPEED_LOW) : Convert.ToSByte(SPEED_MAX);
+            return Convert.ToSByte((delta <= BoundReduceSpeed) ? Velocity.Lowest : Velocity.Highest);
         }
 
         private void SetRotatingSpeed(int delta, RotationDirection direction)
         {
-            if (delta <= BOUND_REDUCE_SPEED)
+            if (delta <= BoundReduceSpeed)
             {
                 if (direction == RotationDirection.Left)
                 {
@@ -194,29 +204,39 @@ namespace LegoPacman.classes
             }
         }
 
+        public void RotateLeft(int degrees)
+        {
+            Rotate(degrees, RotationDirection.Left);
+        }
+
+        public void RotateRight(int degrees)
+        {
+            Rotate(degrees, RotationDirection.Right);
+        }
+
         public void Rotate(int degrees, RotationDirection direction)
         {
             gyroSensor.Reset();
-
             var currentAngle = ReadGyro(direction);
 
             int targetAngle;
             if (direction == RotationDirection.Left)
             {
                 targetAngle = degrees;
-                vehicle.SpinLeft(GetRotatingSpeed(getAbsDelta(currentAngle, targetAngle)));
+                vehicle.SpinLeft(GetRotatingSpeed(LegoMath.AbsDelta(currentAngle, targetAngle)));
             }
             else
             {
                 targetAngle = 360 - degrees;
-                vehicle.SpinRight(GetRotatingSpeed(getAbsDelta(currentAngle, targetAngle)));
+                vehicle.SpinRight(GetRotatingSpeed(LegoMath.AbsDelta(currentAngle, targetAngle)));
             }
 
             while (!NeedToStopSpinning(direction, currentAngle, targetAngle))
             {
                 currentAngle = ReadGyro(direction);
-                SetRotatingSpeed(getAbsDelta(currentAngle, targetAngle), direction);
+                SetRotatingSpeed(LegoMath.AbsDelta(currentAngle, targetAngle), direction);
             }
+
             vehicle.Brake();
         }
     }

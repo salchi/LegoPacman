@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace LegoPacman.classes
@@ -22,8 +23,8 @@ namespace LegoPacman.classes
         {
             for (int i = start; i <= end; i += step)
             {
-                roboter.Rotate(i, RotationDirection.Left);
-                roboter.Rotate(i, RotationDirection.Right);
+                roboter.RotateLeft(i);
+                roboter.RotateRight(i);
             }
         }
 
@@ -41,15 +42,22 @@ namespace LegoPacman.classes
         public static void ForwardBackward()
         {
             var v = new Vehicle(MotorPort.OutD, MotorPort.OutA);
-            LcdConsole.WriteLine("reverseLEft {0}  reverseRight {1}", v.ReverseLeft, v.ReverseRight);
-            LcdConsole.WriteLine("forward with speed");
+
+            LcdConsole.WriteLine("isLeftReversed {0}  isRightReversed {1}", v.ReverseLeft, v.ReverseRight);
+
+            LcdConsole.WriteLine("forward with speed 20");
             v.Forward(20);
-            LcdConsole.WriteLine("forward with degrees");
+            Thread.Sleep(2000);
+
+            LcdConsole.WriteLine("forward for 400 degrees");
             var handle = v.Forward(20, 400, true);
             handle.WaitOne();
-            LcdConsole.WriteLine("backward with speed");
+
+            LcdConsole.WriteLine("backward with speed 20");
             v.Backward(20);
-            LcdConsole.WriteLine("backward with degrees");
+            Thread.Sleep(2000);
+
+            LcdConsole.WriteLine("backward for 400 degrees");
             handle = v.Backward(20,400,true);
             handle.WaitOne();
         }

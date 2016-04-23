@@ -10,16 +10,13 @@ namespace LegoPacman.classes
 {
     public class ColorReader
     {
-        private const double LOW_INVALID_THRESHOLD = 4d;
-        private const double SPIKE_VALID_THRESHOLD = 8d;
-
         private readonly EV3ColorSensor colorSensor;
         public RGBColor LastRead { get; private set; }
 
         public ColorReader(SensorPort colorPort)
         {
             colorSensor = new EV3ColorSensor(colorPort, ColorMode.RGB);
-            LastRead = KnownColor.Invalid.TargetColor;
+            LastRead = KnownColor.Invalid.RgbDefinition;
         }
 
         public bool TryRead()
@@ -29,10 +26,12 @@ namespace LegoPacman.classes
             return IsValidColor(LastRead);
         }
 
+        private const double LowInvalidThreshold = 4d;
+        private const double SpikeValidThreshold = 8d;
         private bool IsValidColor(RGBColor c)
         {
-            return c.Red > LOW_INVALID_THRESHOLD && c.Green > LOW_INVALID_THRESHOLD && 
-                c.Blue > LOW_INVALID_THRESHOLD || LegoUtils.Max3(c.Red, c.Green, c.Blue) >= SPIKE_VALID_THRESHOLD;
+            return (c.Red > LowInvalidThreshold && c.Green > LowInvalidThreshold && 
+                c.Blue > LowInvalidThreshold) || LegoMath.Max3(c.Red, c.Green, c.Blue) >= SpikeValidThreshold;
         }
     }
 }
