@@ -23,9 +23,9 @@ namespace LegoPacman.classes
             return Math.Max(Math.Max(a, b), c);
         }
 
-        const double WheelDiameter = 3.4;
         public static uint CmToEngineDegrees(double distanceInCm)
         {
+            const double WheelDiameter = 3.4;
             return (uint)Math.Round((360 * distanceInCm) / (Math.PI * WheelDiameter / 2));
         }
     }

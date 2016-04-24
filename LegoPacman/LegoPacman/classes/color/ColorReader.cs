@@ -26,11 +26,12 @@ namespace LegoPacman.classes
             return IsValidColor(LastRead);
         }
 
-        private const double LowInvalidThreshold = 4d;
-        private const double SpikeValidThreshold = 8d;
         private bool IsValidColor(RGBColor c)
         {
-            return (c.Red > LowInvalidThreshold && c.Green > LowInvalidThreshold && 
+            const double LowInvalidThreshold = 4d;
+            const double SpikeValidThreshold = 8d;
+
+            return (c.Red > LowInvalidThreshold && c.Green > LowInvalidThreshold &&
                 c.Blue > LowInvalidThreshold) || LegoMath.Max3(c.Red, c.Green, c.Blue) >= SpikeValidThreshold;
         }
     }

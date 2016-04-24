@@ -33,13 +33,15 @@ namespace LegoPacman.classes
         private const MotorPort PortMotorLeft = MotorPort.OutD;
         private const MotorPort PortMotorRight = MotorPort.OutA;
 
-        public SensorProxy SensorProxy { get; } = new SensorProxy(gyroPort: PortGyro, ultrasonicPort: PortUltrasonic, colorPort: PortColor);
+        public SensorProxy SensorProxy { get; }
         public VehicleProxy VehicleProxy { get; }
-        private ColorAnalyzer colorAnalyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.Fence_temp, KnownColor.Blue });
+        private ColorAnalyzer colorAnalyzer;
 
         public Roboter()
         {
             VehicleProxy = new VehicleProxy(SensorProxy, left: PortMotorLeft, right: PortMotorRight);
+            SensorProxy = new SensorProxy(gyroPort: PortGyro, ultrasonicPort: PortUltrasonic, colorPort: PortColor);
+            colorAnalyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.Fence_temp, KnownColor.Blue });
         }
 
         private void HandleReadColor()
@@ -77,11 +79,12 @@ namespace LegoPacman.classes
         }
 
         // in cm
-        private const int IrSensorFrontCenterDifference = 3;
-        private const int TurningBuffer = 3;
-        private const int AngleToFence = 45;
         public void MoveToFence()
         {
+            const int IrSensorFrontCenterDifference = 3;
+            const int TurningBuffer = 3;
+            const int AngleToFence = 45;
+
             var distance = LegoMath.DoubleToInt(SensorProxy.ReadDistanceInCm());
             LegoUtils.PrintAndWait(2, "initial distance: {0}", distance);
 
@@ -98,17 +101,18 @@ namespace LegoPacman.classes
         }
 
         // in cm
-        private const int SlowThresholdDistance = 3;
-        private const double FastMomentumFactor = .85d;
-        private const double SlowMomentumFactor = .90d;
-        private const int FastBrakeAngle = 15;
-        private const int SlowBrakeDistance = 2;
         public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
         {
+            const int SlowThresholdDistance = 3;
+            const double FastMomentumFactor = .85d;
+            const double SlowMomentumFactor = .90d;
+            const int FastBrakeAngle = 15;
+            const int SlowBrakeDistance = 2;
+
             if (cm > SlowThresholdDistance)
             {
                 uint cmCalcDeg = LegoMath.CmToEngineDegrees(cm - SlowThresholdDistance);
-  
+
                 uint fastDegrees = (uint)Math.Round((cmCalcDeg * FastMomentumFactor) - FastBrakeAngle);
                 uint slowDegrees = LegoMath.CmToEngineDegrees(SlowThresholdDistance) - SlowBrakeDistance;
 

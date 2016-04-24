@@ -20,9 +20,9 @@ namespace LegoPacman.classes
             return x => !predicate(x);
         }
 
-        private const int CharsPerLine = 28;
         public static void PrintLongString(string content)
         {
+            const int CharsPerLine = 28;
             for (int charsPrinted = 0; charsPrinted < content.Length;)
             {
                 int charsToPrint = Math.Min(content.Length - charsPrinted, CharsPerLine);

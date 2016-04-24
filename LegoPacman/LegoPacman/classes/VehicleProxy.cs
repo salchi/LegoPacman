@@ -113,22 +113,22 @@ namespace LegoPacman.classes
             BreakWhen(valueSource, brakeCondition);
         }
 
-        private const int BoundStopSpinning = 2;
-        public bool NeedToStopSpinning(RotationDirection direction, int currentAngle, int targetAngle)
+        private const int AngleStopSpinning = 2;
+        public bool NeedToStopSpinning(int currentAngle, int targetAngle)
         {
-            return LegoMath.AbsDelta(currentAngle, targetAngle) <= BoundStopSpinning;
+            return LegoMath.AbsDelta(currentAngle, targetAngle) <= AngleStopSpinning;
         }
 
 
-        private const int BoundReduceSpeed = 10;
+        private const int AngleReduceSpeed = 10;
         public sbyte GetRotatingSpeed(int delta)
         {
-            return Convert.ToSByte((delta <= BoundReduceSpeed) ? Velocity.Lowest : Velocity.Highest);
+            return Convert.ToSByte((delta <= AngleReduceSpeed) ? Velocity.Lowest : Velocity.Highest);
         }
 
         public void SetRotatingSpeed(int delta, RotationDirection direction)
         {
-            if (delta <= BoundReduceSpeed)
+            if (delta <= AngleReduceSpeed)
             {
                 if (direction == RotationDirection.Left)
                 {
@@ -168,7 +168,7 @@ namespace LegoPacman.classes
                 vehicle.SpinRight(GetRotatingSpeed(LegoMath.AbsDelta(currentAngle, targetAngle)));
             }
 
-            while (!NeedToStopSpinning(direction, currentAngle, targetAngle))
+            while (!NeedToStopSpinning(currentAngle, targetAngle))
             {
                 currentAngle = sensorProxy.ReadGyro(direction);
                 SetRotatingSpeed(LegoMath.AbsDelta(currentAngle, targetAngle), direction);

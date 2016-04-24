@@ -23,11 +23,12 @@ namespace LegoPacman.classes
             ColorReader = new ColorReader(colorPort);
         }
 
-        private const int MaxTries = 100;
-        // the ultrasonic sensor seemingly returns the distance in millimeters
-        private const double MmToCmFactor = 0.1d;
         public double ReadDistanceInCm()
         {
+            const int MaxTries = 100;
+            // the ultrasonic sensor seemingly returns the distance in millimeters
+            const double MmToCmFactor = 0.1d;
+
             var val = ultrasonicSensor.Read();
             var tries = 0;
             while (val == 0 && tries < MaxTries)
