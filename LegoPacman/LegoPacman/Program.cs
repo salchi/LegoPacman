@@ -82,6 +82,7 @@ namespace LegoPacman
             };
 
             terminateProgram.WaitOne();
+            RoboTest.TurnOffMotors();
         }
     }
 }

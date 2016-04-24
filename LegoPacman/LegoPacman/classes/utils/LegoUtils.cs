@@ -15,6 +15,11 @@ namespace LegoPacman.classes
             handle.WaitOne();
         }
 
+        public static Predicate<T> Negate<T>(Predicate<T> predicate)
+        {
+            return x => !predicate(x);
+        }
+
         private const int CharsPerLine = 28;
         public static void PrintLongString(string content)
         {

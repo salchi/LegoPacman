@@ -23,8 +23,8 @@ namespace LegoPacman.classes
         {
             for (int i = start; i <= end; i += step)
             {
-                roboter.RotateLeft(i);
-                roboter.RotateRight(i);
+                roboter.VehicleProxy.RotateLeft(i);
+                roboter.VehicleProxy.RotateRight(i);
             }
         }
 
@@ -70,6 +70,11 @@ namespace LegoPacman.classes
         public static void MoveToFence()
         {
             roboter.MoveToFence();
+        }
+
+        public static void TurnOffMotors()
+        {
+            roboter.TurnMotorsOff();
         }
     }
 }
