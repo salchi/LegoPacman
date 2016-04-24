@@ -46,13 +46,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="classes\ColorAnalyzer.cs" />
-    <Compile Include="classes\ColorReader.cs" />
-    <Compile Include="classes\KnownColor.cs" />
-    <Compile Include="classes\LegoUtils.cs" />
-    <Compile Include="classes\RGBColorHelper.cs" />
+    <Compile Include="classes\color\ColorAnalyzer.cs" />
+    <Compile Include="classes\color\ColorReader.cs" />
+    <Compile Include="classes\color\KnownColor.cs" />
+    <Compile Include="classes\SensorProxy.cs" />
+    <Compile Include="classes\utils\LegoMath.cs" />
+    <Compile Include="classes\utils\LegoUtils.cs" />
+    <Compile Include="classes\color\RGBColorHelper.cs" />
     <Compile Include="classes\Roboter.cs" />
     <Compile Include="classes\RoboTest.cs" />
+    <Compile Include="classes\VehicleProxy.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
