@@ -39,8 +39,8 @@ namespace LegoPacman.classes
 
         public Roboter()
         {
-            VehicleProxy = new VehicleProxy(SensorProxy, left: PortMotorLeft, right: PortMotorRight);
             SensorProxy = new SensorProxy(gyroPort: PortGyro, ultrasonicPort: PortUltrasonic, colorPort: PortColor);
+            VehicleProxy = new VehicleProxy(SensorProxy, left: PortMotorLeft, right: PortMotorRight);
             colorAnalyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.Fence_temp, KnownColor.Blue });
         }
 
@@ -50,53 +50,55 @@ namespace LegoPacman.classes
 
             if (lastRead == KnownColor.Blue)
             {
-                LcdConsole.WriteLine("got Blue!!");
+                LcdConsole.WriteLine("got Blue");
                 VehicleProxy.RotateLeft(90);
-                MoveForwardByCm(20);
+                MoveForwardByCm(10);
             }
             else if (lastRead == KnownColor.Invalid)
             {
-                LcdConsole.WriteLine("got invalid color!!");
+                LcdConsole.WriteLine("got invalid color");
                 VehicleProxy.RotateRight(10);
                 MoveForwardByCm(5);
                 VehicleProxy.RotateLeft(SensorProxy.ReadGyro(RotationDirection.Right));
+                LegoUtils.PrintAndWait(2, "rotation done");
                 FollowFence();
             }
         }
 
         public void FollowFence()
         {
-            VehicleProxy.MoveForward(Velocity.Medium);
             SensorProxy.ColorReader.TryRead();
 
-            while (colorAnalyzer.Analyze(SensorProxy.ColorReader.LastRead) == KnownColor.Fence_temp)
+            VehicleProxy.MoveForwardWhile(() =>
             {
-                SensorProxy.ColorReader.TryRead();                
-            }
+                SensorProxy.ColorReader.TryRead();
+                return SensorProxy.ColorReader.LastRead;
+            }, color => colorAnalyzer.Analyze(color) == KnownColor.Fence_temp);
 
-            VehicleProxy.Brake();
-            HandleReadColor();
+            //HandleReadColor();
         }
 
         // in cm
         public void MoveToFence()
         {
             const int IrSensorFrontCenterDifference = 3;
-            const int TurningBuffer = 3;
-            const int AngleToFence = 45;
+            const int TurningBuffer = 9;
+            const int CurveDistance = IrSensorFrontCenterDifference + TurningBuffer + 9;
 
             var distance = LegoMath.DoubleToInt(SensorProxy.ReadDistanceInCm());
-            LegoUtils.PrintAndWait(2, "initial distance: {0}", distance);
+            //LegoUtils.PrintAndWait(2, "initial distance: {0}", distance);
 
             int distanceToFence = distance - IrSensorFrontCenterDifference - TurningBuffer;
-            LcdConsole.WriteLine("fence drive distance: {0}", distanceToFence);
+            //LcdConsole.WriteLine("fence drive distance: {0}", distanceToFence);
 
             VehicleProxy.RotateRight(90);
             MoveForwardByCm(distanceToFence, false);
 
-            VehicleProxy.TurnLeftForward(Velocity.Medium, 100, LegoMath.CmToEngineDegrees(IrSensorFrontCenterDifference + TurningBuffer));
+            VehicleProxy.TurnLeftForward(Velocity.Medium, 100, LegoMath.CmToEngineDegrees(CurveDistance));
 
-            VehicleProxy.RotateLeft(AngleToFence);
+            MoveForwardByCm(1);
+
+            VehicleProxy.RotateLeft(SensorProxy.ReadGyro(RotationDirection.Left));
             LegoUtils.PrintAndWait(3, "finished moveToFence");
         }
 

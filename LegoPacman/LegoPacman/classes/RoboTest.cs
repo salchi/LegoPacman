@@ -41,30 +41,32 @@ namespace LegoPacman.classes
 
         public static void ForwardBackward()
         {
-            var v = new Vehicle(MotorPort.OutD, MotorPort.OutA);
-
-            LcdConsole.WriteLine("isLeftReversed {0}  isRightReversed {1}", v.ReverseLeft, v.ReverseRight);
-
-            LcdConsole.WriteLine("forward with speed 20");
-            v.Forward(20);
+            LcdConsole.WriteLine("forward with speed 20"); // b
+            roboter.VehicleProxy.MoveForward(20);
             Thread.Sleep(2000);
 
-            LcdConsole.WriteLine("forward for 400 degrees");
-            var handle = v.Forward(20, 400, true);
-            handle.WaitOne();
-
-            LcdConsole.WriteLine("backward with speed 20");
-            v.Backward(20);
+            LcdConsole.WriteLine("forward 360 deg"); // f
+            LegoUtils.WaitOnHandle(roboter.VehicleProxy.Vehicle.Forward(Velocity.Medium, 360, true));
             Thread.Sleep(2000);
 
-            LcdConsole.WriteLine("backward for 400 degrees");
-            handle = v.Backward(20,400,true);
-            handle.WaitOne();
+            LcdConsole.WriteLine("backward 360 deg"); //  f
+            LegoUtils.WaitOnHandle(roboter.VehicleProxy.Vehicle.Backward(Velocity.Medium, 360, true));
+            Thread.Sleep(2000);
+
+            LcdConsole.WriteLine("backward with speed 20"); // b
+            roboter.VehicleProxy.MoveBackward(20);
+            Thread.Sleep(2000);
+
+            roboter.TurnMotorsOff();
         }
 
         public static void MoveForwardByCm(int distance)
         {
-            roboter.MoveForwardByCm(distance);
+            for (int i = 5; i <= 50; i+=5)
+            {
+                LegoUtils.PrintAndWait(2, "distance: {0}", i);
+                roboter.MoveForwardByCm(i);
+            }
         }
 
         public static void MoveToFence()

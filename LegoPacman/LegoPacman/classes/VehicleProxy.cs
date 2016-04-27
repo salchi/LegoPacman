@@ -11,18 +11,20 @@ namespace LegoPacman.classes
 {
     class VehicleProxy
     {
-        private Vehicle vehicle;
+        public Vehicle Vehicle { get; }
         private SensorProxy sensorProxy;
+
+        private const int AngleReduceSpeed = 10;
 
         public VehicleProxy(SensorProxy sensorProxy, MotorPort left, MotorPort right)
         {
             this.sensorProxy = sensorProxy;
-            vehicle = new Vehicle(left, right);
+            Vehicle = new Vehicle(left, right);
         }
 
         public void Brake()
         {
-            vehicle.Brake();
+            Vehicle.Brake();
         }
 
         public void BrakeDelayed(int delayInMillis)
@@ -34,13 +36,13 @@ namespace LegoPacman.classes
         public void ForwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
         {
             LcdConsole.WriteLine("moving forward: speed {0} deg {1} brake {2}", speed, degrees, brakeOnFinish);
-            LegoUtils.WaitOnHandle(vehicle.Backward(speed, degrees, brakeOnFinish));
+            LegoUtils.WaitOnHandle(Vehicle.Backward(speed, degrees, brakeOnFinish));
         }
 
         public void BackwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
         {
             LcdConsole.WriteLine("moving backward: speed {0} deg {1} brake {2}", speed, degrees, brakeOnFinish);
-            LegoUtils.WaitOnHandle(vehicle.Forward(speed, degrees, brakeOnFinish));
+            LegoUtils.WaitOnHandle(Vehicle.Forward(speed, degrees, brakeOnFinish));
         }
 
 
@@ -52,17 +54,18 @@ namespace LegoPacman.classes
                 value = valueSource();
             }
 
-            vehicle.Brake();
+            Vehicle.Brake();
         }
 
         public void MoveForward(sbyte speed)
         {
-            vehicle.Backward(speed);
+            LegoUtils.PrintAndWait(2, "ReverseLeft: {0} | ReverseRight {1}", Vehicle.ReverseLeft, Vehicle.ReverseRight);
+            Vehicle.Backward((sbyte)-speed);
         }
 
         public void MoveBackward(sbyte speed)
         {
-            vehicle.Forward(speed);
+            Vehicle.Forward(speed);
         }
 
         public void MoveForwardWhile<T>(Func<T> valueSource, Predicate<T> brakeCondition)
@@ -91,68 +94,61 @@ namespace LegoPacman.classes
 
         public void RotateLeftWhile<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
-            vehicle.SpinLeft(Velocity.Medium);
+            Vehicle.SpinLeft(Velocity.Medium);
             BreakWhen(valueSource, LegoUtils.Negate(brakeCondition));
         }
 
         public void RotateRightWhile<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
-            vehicle.SpinRight(Velocity.Medium);
+            Vehicle.SpinRight(Velocity.Medium);
             BreakWhen(valueSource, LegoUtils.Negate(brakeCondition));
         }
 
         public void RotateLeftUntil<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
-            vehicle.SpinLeft(Velocity.Medium);
+            Vehicle.SpinLeft(Velocity.Medium);
             BreakWhen(valueSource, brakeCondition);
         }
 
         public void RotateRightUntil<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
-            vehicle.SpinRight(Velocity.Medium);
+            Vehicle.SpinRight(Velocity.Medium);
             BreakWhen(valueSource, brakeCondition);
         }
 
-        private const int AngleStopSpinning = 2;
-        public bool NeedToStopSpinning(int currentAngle, int targetAngle)
-        {
-            return LegoMath.AbsDelta(currentAngle, targetAngle) <= AngleStopSpinning;
-        }
-
-
-        private const int AngleReduceSpeed = 10;
         public sbyte GetRotatingSpeed(int delta)
         {
             return Convert.ToSByte((delta <= AngleReduceSpeed) ? Velocity.Lowest : Velocity.Highest);
         }
 
-        public void SetRotatingSpeed(int delta, RotationDirection direction)
-        {
-            if (delta <= AngleReduceSpeed)
-            {
-                if (direction == RotationDirection.Left)
-                {
-                    vehicle.SpinLeft(GetRotatingSpeed(delta));
-                }
-                else
-                {
-                    vehicle.SpinRight(GetRotatingSpeed(delta));
-                }
-            }
-        }
-
         public void RotateLeft(int degrees)
         {
-            Rotate(degrees, RotationDirection.Left);
+            try
+            {
+                Rotate(degrees, RotationDirection.Left);
+            }
+            catch (Exception e)
+            { 
+                LegoUtils.PrintLongString(e.Message);
+            }
         }
 
         public void RotateRight(int degrees)
         {
-            Rotate(degrees, RotationDirection.Right);
+            try
+            {
+                Rotate(degrees, RotationDirection.Right);
+            }
+            catch (Exception e)
+            {
+                LegoUtils.PrintLongString(e.Message);
+            }
         }
 
         public void Rotate(int degrees, RotationDirection direction)
         {
+            const int AngleStopSpinning = 3;
+
             sensorProxy.ResetGyro();
             var currentAngle = sensorProxy.ReadGyro(direction);
 
@@ -160,31 +156,51 @@ namespace LegoPacman.classes
             if (direction == RotationDirection.Left)
             {
                 targetAngle = degrees;
-                vehicle.SpinLeft(GetRotatingSpeed(LegoMath.AbsDelta(currentAngle, targetAngle)));
+                Vehicle.SpinLeft(GetRotatingSpeed(LegoMath.AbsDelta(currentAngle, targetAngle)));
             }
             else
             {
                 targetAngle = 360 - degrees;
-                vehicle.SpinRight(GetRotatingSpeed(LegoMath.AbsDelta(currentAngle, targetAngle)));
+                Vehicle.SpinRight(GetRotatingSpeed(LegoMath.AbsDelta(currentAngle, targetAngle)));
             }
 
-            while (!NeedToStopSpinning(currentAngle, targetAngle))
+            while (LegoMath.AbsDelta(currentAngle, targetAngle) > AngleReduceSpeed)
             {
                 currentAngle = sensorProxy.ReadGyro(direction);
-                SetRotatingSpeed(LegoMath.AbsDelta(currentAngle, targetAngle), direction);
             }
 
-            vehicle.Brake();
+            Vehicle.Brake();
+
+            if (direction == RotationDirection.Left)
+            {
+                Vehicle.SpinLeft(Velocity.Lowest);
+            }
+            else
+            {
+                Vehicle.SpinRight(Velocity.Lowest);
+            }
+
+            while (LegoMath.AbsDelta(currentAngle, targetAngle) > AngleStopSpinning)
+            {
+                currentAngle = sensorProxy.ReadGyro(direction);
+            }
+
+            Vehicle.Brake();
         }
 
         public void TurnLeftForward(sbyte speed, sbyte turnPercentage, uint degrees, bool brake = true)
         {
-            LegoUtils.WaitOnHandle(vehicle.TurnRightReverse(speed, turnPercentage, degrees, brake));
+            LegoUtils.WaitOnHandle(Vehicle.TurnRightReverse(speed, turnPercentage, degrees, brake));
+        }
+
+        public void TurnRightForward(sbyte speed, sbyte turnPercentage, uint degrees, bool brake = true)
+        {
+            LegoUtils.WaitOnHandle(Vehicle.TurnLeftReverse(speed, turnPercentage, degrees, brake));
         }
 
         public void TurnMotorsOff()
         {
-            vehicle.Off();
+            Vehicle.Off();
         }
     }
 }

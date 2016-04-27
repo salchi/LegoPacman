@@ -21,6 +21,7 @@ namespace LegoPacman.classes
             gyroSensor = new EV3GyroSensor(gyroPort, GyroMode.Angle);
             ultrasonicSensor = new EV3UltrasonicSensor(ultrasonicPort, UltraSonicMode.Centimeter);
             ColorReader = new ColorReader(colorPort);
+            LegoUtils.NullPrint("gyroSensor", gyroSensor);
         }
 
         public double ReadDistanceInCm()
@@ -38,7 +39,7 @@ namespace LegoPacman.classes
                 Thread.Sleep(20);
             }
 
-            LcdConsole.WriteLine("read dist {0}, {1} tries", val * MmToCmFactor);
+            LcdConsole.WriteLine("read dist {0}, {1} tries", val * MmToCmFactor, tries);
 
             return val * MmToCmFactor;
         }
