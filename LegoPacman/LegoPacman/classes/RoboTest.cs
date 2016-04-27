@@ -66,6 +66,7 @@ namespace LegoPacman.classes
             {
                 LegoUtils.PrintAndWait(2, "distance: {0}", i);
                 roboter.MoveForwardByCm(i);
+                roboter.MoveBackwardByCm(i);
             }
         }
 

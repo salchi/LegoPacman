@@ -82,28 +82,50 @@ namespace LegoPacman.classes
         public void MoveToFence()
         {
             const int IrSensorFrontCenterDifference = 3;
-            const int TurningBuffer = 9;
+            const int TurningBuffer = 10;
             const int CurveDistance = IrSensorFrontCenterDifference + TurningBuffer + 9;
 
-            var distance = LegoMath.DoubleToInt(SensorProxy.ReadDistanceInCm());
+            var distance = SensorProxy.ReadDistanceInCm();
             //LegoUtils.PrintAndWait(2, "initial distance: {0}", distance);
 
-            int distanceToFence = distance - IrSensorFrontCenterDifference - TurningBuffer;
+            double distanceToFence = distance - IrSensorFrontCenterDifference - TurningBuffer;
             //LcdConsole.WriteLine("fence drive distance: {0}", distanceToFence);
 
             VehicleProxy.RotateRight(90);
             MoveForwardByCm(distanceToFence, false);
 
+            LegoUtils.PrintAndWait(2, "moved by cm");
+
             VehicleProxy.TurnLeftForward(Velocity.Medium, 100, LegoMath.CmToEngineDegrees(CurveDistance));
+            LegoUtils.PrintAndWait(10, "turned left forward");
 
-            MoveForwardByCm(1);
+            MoveForwardByCm(3);
 
-            VehicleProxy.RotateLeft(SensorProxy.ReadGyro(RotationDirection.Left));
-            LegoUtils.PrintAndWait(3, "finished moveToFence");
+            LegoUtils.PrintAndWait(10, "moved forward again");
+
+            var endDeg = SensorProxy.ReadGyro(RotationDirection.Left);
+            LegoUtils.PrintAndWait(1, "rotleft deg: {0}", endDeg);
+            VehicleProxy.RotateLeft(endDeg);
+            LegoUtils.PrintAndWait(10, "finished moveToFence");
+        }
+
+        enum Direction
+        {
+            Forward, Backward
         }
 
         // in cm
-        public void MoveForwardByCm(int cm, bool brakeOnFinish = true)
+        public void MoveForwardByCm(double cm, bool brakeOnFinish = true)
+        {
+            MoveByCm(cm, Direction.Forward, brakeOnFinish);
+        }
+
+        public void MoveBackwardByCm(double cm, bool brakeOnFinish = true)
+        {
+            MoveByCm(cm, Direction.Backward, brakeOnFinish);
+        }
+
+        private void MoveByCm(double cm, Direction direction, bool brakeOnFinish = true)
         {
             const int SlowThresholdDistance = 3;
             const double FastMomentumFactor = .85d;
@@ -120,14 +142,26 @@ namespace LegoPacman.classes
 
                 LcdConsole.WriteLine("fastdeg: {0} slowdeg:{1}", fastDegrees, slowDegrees);
 
-                VehicleProxy.ForwardByDegrees(Velocity.Highest, fastDegrees, false);
-                VehicleProxy.ForwardByDegrees(Velocity.Lowest, slowDegrees);
+                MoveByDegrees(Velocity.Highest, fastDegrees, direction, false);
+                MoveByDegrees(Velocity.Low, slowDegrees, direction, brakeOnFinish);
             }
             else
             {
                 uint slowDegrees = (uint)Math.Round(LegoMath.CmToEngineDegrees(cm) * SlowMomentumFactor) - SlowBrakeDistance;
                 LcdConsole.WriteLine("slow deg: {0}", slowDegrees);
-                VehicleProxy.ForwardByDegrees(Velocity.Lowest, slowDegrees);
+                MoveByDegrees(Velocity.Low, slowDegrees, direction, brakeOnFinish);
+            }
+        }
+
+        private void MoveByDegrees(sbyte speed, uint degrees, Direction direction, bool brakeOnFinish = true)
+        {
+            if (direction == Direction.Forward)
+            {
+                VehicleProxy.ForwardByDegrees(speed, degrees, brakeOnFinish);
+            }
+            else
+            {
+                VehicleProxy.BackwardByDegrees(speed, degrees, brakeOnFinish);
             }
         }
 
