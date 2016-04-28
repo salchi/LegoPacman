@@ -46,7 +46,7 @@ namespace LegoPacman.classes
 
         private void HandleReadColor()
         {
-            var lastRead = colorAnalyzer.Analyze(SensorProxy.ColorReader.LastRead);
+            var lastRead = colorAnalyzer.Analyze(SensorProxy.ColorReader.ReadColor());
 
             if (lastRead == KnownColor.Blue)
             {
@@ -67,13 +67,7 @@ namespace LegoPacman.classes
 
         public void FollowFence()
         {
-            SensorProxy.ColorReader.TryRead();
-
-            VehicleProxy.MoveForwardWhile(() =>
-            {
-                SensorProxy.ColorReader.TryRead();
-                return SensorProxy.ColorReader.LastRead;
-            }, color => colorAnalyzer.Analyze(color) == KnownColor.Fence_temp);
+            VehicleProxy.MoveForwardWhile(() => SensorProxy.ColorReader.ReadColor(), color => colorAnalyzer.Analyze(color) == KnownColor.Fence_temp);
 
             //HandleReadColor();
         }
