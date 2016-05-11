@@ -39,8 +39,6 @@ namespace LegoPacman.classes
                 Thread.Sleep(20);
             }
 
-            LcdConsole.WriteLine("read dist {0}, {1} tries", val * MmToCmFactor, tries);
-
             return val * MmToCmFactor;
         }
 

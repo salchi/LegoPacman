@@ -69,7 +69,7 @@ namespace LegoPacman.classes
         {
             SensorProxy.ColorReader.TryRead();
 
-            VehicleProxy.MoveForwardWhile(() =>
+            VehicleProxy.MoveForwardUntil(() =>
             {
                 SensorProxy.ColorReader.TryRead();
                 return SensorProxy.ColorReader.LastRead;

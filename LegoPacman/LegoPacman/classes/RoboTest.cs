@@ -19,6 +19,13 @@ namespace LegoPacman.classes
             roboter.FollowFence();
         }
 
+        public static void GetColor()
+        {
+            roboter.SensorProxy.ColorReader.TryRead();
+            var analyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.Fence_temp, KnownColor.Blue, KnownColor.Red, KnownColor.White, KnownColor.Yellow });
+            LcdConsole.WriteLine(analyzer.Analyze(roboter.SensorProxy.ColorReader.LastRead).Name);
+        }
+
         public static void Rotation(int start, int end, int step)
         {
             for (int i = start; i <= end; i += step)
@@ -26,6 +33,11 @@ namespace LegoPacman.classes
                 roboter.VehicleProxy.RotateLeft(i);
                 roboter.VehicleProxy.RotateRight(i);
             }
+        }
+
+        public static void Rotate(int degrees, RotationDirection direction)
+        {
+            roboter.VehicleProxy.Rotate(degrees, direction);
         }
 
         public static void TestUltrasonic()
@@ -60,14 +72,20 @@ namespace LegoPacman.classes
             roboter.TurnMotorsOff();
         }
 
-        public static void MoveForwardByCm(int distance)
+        public static void ReadColor()
         {
-            for (int i = 5; i <= 50; i+=5)
-            {
-                LegoUtils.PrintAndWait(2, "distance: {0}", i);
-                roboter.MoveForwardByCm(i);
-                roboter.MoveBackwardByCm(i);
-            }
+            roboter.SensorProxy.ColorReader.TryRead();
+            LcdConsole.WriteLine(RGBColorHelper.ToString(roboter.SensorProxy.ColorReader.LastRead));
+        }
+
+        public static void MoveTest(int distance)
+        {
+            LcdConsole.WriteLine("forward distance: {0}", distance);
+            roboter.MoveForwardByCm(distance);
+            Thread.Sleep(2000);
+
+            LcdConsole.WriteLine("backward distance: {0}", distance);
+            roboter.MoveBackwardByCm(distance);
         }
 
         public static void MoveToFence()
@@ -78,6 +96,16 @@ namespace LegoPacman.classes
         public static void TurnOffMotors()
         {
             roboter.TurnMotorsOff();
+        }
+
+        public static void MoveForwardWhile()
+        {
+            roboter.VehicleProxy.MoveForwardWhile(roboter.SensorProxy.ReadDistanceInCm, x => x > 10);
+        }
+
+        public static void MoveForwardUntil()
+        {
+            roboter.VehicleProxy.MoveForwardUntil(roboter.SensorProxy.ReadDistanceInCm, x => x < 10);
         }
     }
 }

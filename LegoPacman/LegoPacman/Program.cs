@@ -14,6 +14,14 @@ namespace LegoPacman
 {
     class Program
     {   
+        private static void PrintInfo()
+        {
+            LcdConsole.WriteLine("up: moveForwardWhile");
+            LcdConsole.WriteLine("left: MoveToFence");
+            LcdConsole.WriteLine("right: moveForwardUntil");
+            LcdConsole.WriteLine("down: read color");
+        }
+
         static void Main(string[] args)
         {
             var terminateProgram = new ManualResetEvent(false);
@@ -24,48 +32,38 @@ namespace LegoPacman
                 terminateProgram.Set();
             };
 
-            LcdConsole.WriteLine("up: forward backward");
-            LcdConsole.WriteLine("left: MoveForwardByCm");
-            LcdConsole.WriteLine("right: FollowFence");
-            LcdConsole.WriteLine("down: MoveToFence");
+            PrintInfo();
 
             buttonEvents.EnterPressed += () =>
             {
                 LcdConsole.Clear();
-                LcdConsole.WriteLine("up: forward backward");
-                LcdConsole.WriteLine("left: MoveForwardByCm");
-                LcdConsole.WriteLine("right: FollowFence");
-                LcdConsole.WriteLine("down: MoveToFence");
+                PrintInfo();
             };
 
             buttonEvents.UpPressed += () =>
             {
-                /*LegoUtils.PrintAndWait(2, "starting Rotation");
-                RoboTest.Rotation(90, 360, 90);
-                LegoUtils.PrintAndWait(2, "Rotation done");*/
-
-                RoboTest.ForwardBackward();
-;            };
+                LcdConsole.WriteLine("starting moveForwardWhile");
+                RoboTest.MoveForwardWhile();
+                LcdConsole.WriteLine("moveForwardWhile done");
+            };
 
             buttonEvents.LeftPressed += () =>
             {
-                LegoUtils.PrintAndWait(2, "starting MoveForwardByCm");
-                RoboTest.MoveForwardByCm(1);
-                LegoUtils.PrintAndWait(2, "MoveForwardByCm done");
+                LcdConsole.WriteLine("starting MoveToFence");
+                RoboTest.MoveToFence();
+                LcdConsole.WriteLine("MoveToFence done");
             };
 
             buttonEvents.RightPressed += () =>
             {
-                LegoUtils.PrintAndWait(2, "starting FollowFence");
-                RoboTest.FollowFence();
-                LegoUtils.PrintAndWait(2, "FollowFence done");
+                LcdConsole.WriteLine("starting moveForwardUntil");
+                RoboTest.MoveForwardUntil();
+                LcdConsole.WriteLine("moveForwardUntil done");
             };
 
             buttonEvents.DownPressed += () =>
             {
-                LegoUtils.PrintAndWait(2, "starting MoveToFence");
-                RoboTest.MoveToFence();
-                LegoUtils.PrintAndWait(2, "MoveToFence done");
+                RoboTest.GetColor();
             };
 
             terminateProgram.WaitOne();

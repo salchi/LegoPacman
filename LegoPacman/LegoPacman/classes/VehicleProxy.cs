@@ -27,12 +27,6 @@ namespace LegoPacman.classes
             Vehicle.Brake();
         }
 
-        public void BrakeDelayed(int delayInMillis)
-        {
-            Thread.Sleep(delayInMillis);
-            Brake();
-        }
-
         public void ForwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
         {
             LcdConsole.WriteLine("moving forward: speed {0} deg {1} brake {2}", speed, degrees, brakeOnFinish);
@@ -44,7 +38,6 @@ namespace LegoPacman.classes
             LcdConsole.WriteLine("moving backward: speed {0} deg {1} brake {2}", speed, degrees, brakeOnFinish);
             LegoUtils.WaitOnHandle(Vehicle.Forward(speed, degrees, brakeOnFinish));
         }
-
 
         public void BreakWhen<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
