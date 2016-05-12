@@ -16,10 +16,10 @@ namespace LegoPacman
     {   
         private static void PrintInfo()
         {
-            LcdConsole.WriteLine("up: moveForwardWhile");
-            LcdConsole.WriteLine("left: MoveToFence");
-            LcdConsole.WriteLine("right: moveForwardUntil");
-            LcdConsole.WriteLine("down: read color");
+            LcdConsole.WriteLine("up: followFence");
+            LcdConsole.WriteLine("left: moveByCm");
+            LcdConsole.WriteLine("right: readColor");
+            LcdConsole.WriteLine("down: getColor");
         }
 
         static void Main(string[] args)
@@ -42,23 +42,26 @@ namespace LegoPacman
 
             buttonEvents.UpPressed += () =>
             {
-                LcdConsole.WriteLine("starting moveForwardWhile");
-                RoboTest.MoveForwardWhile();
-                LcdConsole.WriteLine("moveForwardWhile done");
+                LcdConsole.WriteLine("starting followFence");
+                RoboTest.FollowFence();
+                LcdConsole.WriteLine("followFence done");
             };
 
             buttonEvents.LeftPressed += () =>
             {
-                LcdConsole.WriteLine("starting MoveToFence");
-                RoboTest.MoveToFence();
-                LcdConsole.WriteLine("MoveToFence done");
+                LcdConsole.WriteLine("starting moveByCm 3");
+                RoboTest.MoveByCm(3);
+                Thread.Sleep(2000);
+                LcdConsole.WriteLine("starting moveByCm 27");
+                RoboTest.MoveByCm(27);
+                LcdConsole.WriteLine("moveByCm done");
             };
 
             buttonEvents.RightPressed += () =>
             {
-                LcdConsole.WriteLine("starting moveForwardUntil");
-                RoboTest.MoveForwardUntil();
-                LcdConsole.WriteLine("moveForwardUntil done");
+                LcdConsole.WriteLine("starting readColor");
+                RoboTest.ReadColor();
+                LcdConsole.WriteLine("readColor done");
             };
 
             buttonEvents.DownPressed += () =>

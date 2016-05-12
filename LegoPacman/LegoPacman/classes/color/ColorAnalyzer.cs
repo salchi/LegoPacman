@@ -20,7 +20,7 @@ namespace LegoPacman.classes
 
         public KnownColor Analyze(RGBColor c)
         {
-            const double MaxAverageDistance = 25d;
+            const double MaxAverageDistance = 35d;
             var currentDistance = MaxAverageDistance;
             var result = KnownColor.Invalid;
 
@@ -42,7 +42,7 @@ namespace LegoPacman.classes
         // max allowed distance for a single color-component
         private static bool SpikeTest(KnownColor color, RGBColor c)
         {
-            const double MaxSpikeDistance = 35d;
+            const double MaxSpikeDistance = 45d;
             return MaxDistance(color, c) <= MaxSpikeDistance;
         }
 

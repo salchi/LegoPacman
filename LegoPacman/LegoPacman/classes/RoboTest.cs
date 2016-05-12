@@ -14,6 +14,11 @@ namespace LegoPacman.classes
     {
         private static Roboter roboter = new Roboter();
 
+        public static void MoveByCm(int cm)
+        {
+            roboter.MoveForwardByCm(cm);
+        }
+
         public static void FollowFence()
         {
             roboter.FollowFence();
@@ -21,9 +26,9 @@ namespace LegoPacman.classes
 
         public static void GetColor()
         {
-            roboter.SensorProxy.ColorReader.TryRead();
             var analyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.Fence_temp, KnownColor.Blue, KnownColor.Red, KnownColor.White, KnownColor.Yellow });
-            LcdConsole.WriteLine(analyzer.Analyze(roboter.SensorProxy.ColorReader.LastRead).Name);
+            var lastRead = analyzer.Analyze(roboter.SensorProxy.ColorReader.ReadColor());
+            LcdConsole.WriteLine(lastRead.Name);
         }
 
         public static void Rotation(int start, int end, int step)
@@ -74,8 +79,8 @@ namespace LegoPacman.classes
 
         public static void ReadColor()
         {
-            roboter.SensorProxy.ColorReader.TryRead();
-            LcdConsole.WriteLine(RGBColorHelper.ToString(roboter.SensorProxy.ColorReader.LastRead));
+            var read = roboter.SensorProxy.ColorReader.ReadColor();
+            LcdConsole.WriteLine(RGBColorHelper.ToString(read));
         }
 
         public static void MoveTest(int distance)

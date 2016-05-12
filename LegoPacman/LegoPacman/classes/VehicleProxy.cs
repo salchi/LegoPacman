@@ -29,14 +29,14 @@ namespace LegoPacman.classes
 
         public void ForwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
         {
-            LcdConsole.WriteLine("moving forward: speed {0} deg {1} brake {2}", speed, degrees, brakeOnFinish);
-            LegoUtils.WaitOnHandle(Vehicle.Backward(speed, degrees, brakeOnFinish));
+            LcdConsole.WriteLine("mov forward speed{0} deg{1} brake{2}", speed, degrees, brakeOnFinish);
+            LegoUtils.WaitOnHandle(Vehicle.Forward(speed, degrees, brakeOnFinish));
         }
 
         public void BackwardByDegrees(sbyte speed, uint degrees, bool brakeOnFinish = true)
         {
-            LcdConsole.WriteLine("moving backward: speed {0} deg {1} brake {2}", speed, degrees, brakeOnFinish);
-            LegoUtils.WaitOnHandle(Vehicle.Forward(speed, degrees, brakeOnFinish));
+            LcdConsole.WriteLine("mov backward speed{0} deg{1} brake{2}", speed, degrees, brakeOnFinish);
+            LegoUtils.WaitOnHandle(Vehicle.Backward(speed, degrees, brakeOnFinish));
         }
 
         public void BreakWhen<T>(Func<T> valueSource, Predicate<T> brakeCondition)
@@ -52,59 +52,98 @@ namespace LegoPacman.classes
 
         public void MoveForward(sbyte speed)
         {
-            LegoUtils.PrintAndWait(2, "ReverseLeft: {0} | ReverseRight {1}", Vehicle.ReverseLeft, Vehicle.ReverseRight);
-            Vehicle.Backward((sbyte)-speed);
+            Vehicle.Forward(speed);
         }
 
         public void MoveBackward(sbyte speed)
         {
-            Vehicle.Forward(speed);
+            Vehicle.Backward(speed);
         }
 
         public void MoveForwardWhile<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
+            if (!brakeCondition(valueSource()))
+            {
+                return;
+            }
+
             MoveForward(Velocity.Medium);
             BreakWhen(valueSource, LegoUtils.Negate(brakeCondition));
         }
 
         public void MoveBackwardWhile<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
+            if (!brakeCondition(valueSource()))
+            {
+                return;
+            }
+
             MoveBackward(Velocity.Medium);
             BreakWhen(valueSource, LegoUtils.Negate(brakeCondition));
         }
 
         public void MoveForwardUntil<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
+            if (brakeCondition(valueSource()))
+            {
+                return;
+            }
+
             MoveForward(Velocity.Medium);
             BreakWhen(valueSource, brakeCondition);
         }
 
         public void MoveBackwardUntil<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
+            if (brakeCondition(valueSource()))
+            {
+                return;
+            }
+
             MoveBackward(Velocity.Medium);
             BreakWhen(valueSource, brakeCondition);
         }
 
         public void RotateLeftWhile<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
+            if (!brakeCondition(valueSource()))
+            {
+                return;
+            }
+
             Vehicle.SpinLeft(Velocity.Medium);
             BreakWhen(valueSource, LegoUtils.Negate(brakeCondition));
         }
 
         public void RotateRightWhile<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
+            if (!brakeCondition(valueSource()))
+            {
+                return;
+            }
+
             Vehicle.SpinRight(Velocity.Medium);
             BreakWhen(valueSource, LegoUtils.Negate(brakeCondition));
         }
 
         public void RotateLeftUntil<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
+            if (brakeCondition(valueSource()))
+            {
+                return;
+            }
+
             Vehicle.SpinLeft(Velocity.Medium);
             BreakWhen(valueSource, brakeCondition);
         }
 
         public void RotateRightUntil<T>(Func<T> valueSource, Predicate<T> brakeCondition)
         {
+            if (brakeCondition(valueSource()))
+            {
+                return;
+            }
+
             Vehicle.SpinRight(Velocity.Medium);
             BreakWhen(valueSource, brakeCondition);
         }
