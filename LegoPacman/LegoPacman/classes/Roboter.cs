@@ -26,12 +26,15 @@ namespace LegoPacman.classes
 
     class Roboter
     {
+        //C
         private const SensorPort PortGyro = SensorPort.In2;
         private const SensorPort PortUltrasonic = SensorPort.In3;
         private const SensorPort PortColor = SensorPort.In4;
 
         private const MotorPort PortMotorLeft = MotorPort.OutD;
         private const MotorPort PortMotorRight = MotorPort.OutA;
+        private const MotorPort PortMotorPrincess = MotorPort.OutB;
+        private const MotorPort PortMotor = MotorPort.OutC;
 
         public SensorProxy SensorProxy { get; }
         public VehicleProxy VehicleProxy { get; }
@@ -41,7 +44,7 @@ namespace LegoPacman.classes
         {
             SensorProxy = new SensorProxy(gyroPort: PortGyro, ultrasonicPort: PortUltrasonic, colorPort: PortColor);
             VehicleProxy = new VehicleProxy(SensorProxy, left: PortMotorLeft, right: PortMotorRight);
-            colorAnalyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.Blue, KnownColor.Red, KnownColor.White, KnownColor.Yellow, KnownColor.Fence_temp, KnownColor.Invalid });
+            colorAnalyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.Blue, KnownColor.Red, KnownColor.White, KnownColor.Yellow, KnownColor.FenceLight, KnownColor.FenceDark, KnownColor.Invalid });
         }
 
         private void HandleReadColor()
@@ -51,43 +54,58 @@ namespace LegoPacman.classes
             if (lastRead == KnownColor.Blue)
             {
                 LcdConsole.WriteLine("got Blue");
-                //right
                 RightTurnAction();
             }
             else if (lastRead == KnownColor.Red)
             {
                 LcdConsole.WriteLine("got Red");
-                //left
                 LeftTurnAction();
             }
             else if (lastRead == KnownColor.White)
             {
                 LcdConsole.WriteLine("got White");
-                //straight ahead
                 StraightAheadAction();
             }
             else if (lastRead == KnownColor.Yellow)
             {
                 LcdConsole.WriteLine("got Yellow");
-                //back
                 TurnBackAction();
             }
             else if (lastRead == KnownColor.Invalid)
             {
                 LcdConsole.WriteLine("got invalid color");
-                /*VehicleProxy.RotateRight(10);
+                VehicleProxy.RotateRight(10);
                 MoveForwardByCm(5);
-                VehicleProxy.RotateLeft(SensorProxy.ReadGyro(RotationDirection.Right));
-                LegoUtils.PrintAndWait(2, "rotation done");*/
-                FollowFence();
+                VehicleProxy.RotateLeft(SensorProxy.ReadGyro(RotationDirection.Right) - 1);
             }
+
+            FollowFence();
+        }
+
+        public void Grab()
+        {
+            var m = new Motor(PortMotorPrincess);
+            m.SetSpeed(10);
+            Thread.Sleep(1000);
+            m.Brake();
+        }
+
+        public void Collect()
+        {
+            var m = new Motor(PortMotor);
+            m.SetSpeed(10);
+            Thread.Sleep(1000);
+            m.Brake();
         }
 
         public void FollowFence()
         {
             VehicleProxy.MoveForwardUntil(
                 SensorProxy.ColorReader.ReadColor,
-                color => KnownColor.ActionColors.Contains(colorAnalyzer.Analyze(color))
+                color => {
+                    var kc = colorAnalyzer.Analyze(color);
+                    return KnownColor.IsActionColor(kc) || kc.Equals(KnownColor.Invalid);
+                    }
                 );
 
             HandleReadColor();
@@ -146,18 +164,21 @@ namespace LegoPacman.classes
             const double FastMomentumFactor = .85d;
             const double SlowMomentumFactor = .90d;
             const int FastBrakeAngle = 15;
-            const int SlowBrakeDistance = 2;
+            const int SlowBrakeDistance = 1;
 
-            if (cm > SlowThresholdDistance)
+            var degrees = (cm >= 10) ? LegoMath.CmToEngineDegrees(cm) * 8 / 7 : LegoMath.CmToEngineDegrees(cm);
+            MoveByDegrees(Velocity.Low, degrees, direction, brakeOnFinish);
+
+            /*if (cm > SlowThresholdDistance)
             {
                 uint cmCalcDeg = LegoMath.CmToEngineDegrees(cm - SlowThresholdDistance);
 
                 uint fastDegrees = (uint)Math.Round((cmCalcDeg * FastMomentumFactor) - FastBrakeAngle);
                 uint slowDegrees = LegoMath.CmToEngineDegrees(SlowThresholdDistance) - SlowBrakeDistance;
 
-                LcdConsole.WriteLine("fastdeg: {0} slowdeg:{1}", fastDegrees, slowDegrees);
+                LcdConsole.WriteLine("fastdeg:{0} slowdeg:{1}", fastDegrees, slowDegrees);
 
-                MoveByDegrees(Velocity.Medium, fastDegrees, direction);
+                MoveByDegrees(Velocity.Medium, fastDegrees, direction, false);
                 MoveByDegrees(Velocity.Low, slowDegrees, direction, brakeOnFinish);
             }
             else
@@ -168,75 +189,66 @@ namespace LegoPacman.classes
                 {
                     MoveByDegrees(Velocity.Low, slowDegrees, direction, brakeOnFinish);
                 }
-            }
+            }*/
         }
 
         private void MoveByDegrees(sbyte speed, uint degrees, Direction direction, bool brakeOnFinish = true)
         {
-            if (direction == Direction.Forward)
+            if (degrees > 0)
             {
-                VehicleProxy.ForwardByDegrees(speed, degrees, brakeOnFinish);
-            }
-            else
-            {
-                VehicleProxy.BackwardByDegrees(speed, degrees, brakeOnFinish);
+                if (direction == Direction.Forward)
+                {
+                    VehicleProxy.ForwardByDegrees(speed, degrees, brakeOnFinish);
+                }
+                else
+                {
+                    VehicleProxy.BackwardByDegrees(speed, degrees, brakeOnFinish);
+                }
             }
         }
 
         const int VehicleLength = 25;
-        const int VehicleWidth = 15;
-        const int FenceLength = 30;
-        const int SensorToBackDistance = 3;
-        const int SensorToFrontDistance = 27;
+        const int VehicleWidth = 16;
+        const int FenceLength = 33;
         const int ColorWidth = 3;
         const int FenceWidth = 3;
-        const int ColorSensorToCenter = 11;
+        const int ColorSensorToCenter = 10;
+        const int ColorSensorFrontToBack = 5;
+        const int CrossingWidth = FenceLength - FenceWidth;
         public void RightTurnAction()
         {
-            //MoveForwardByCm(VehicleWidth / 2 - (ColorSensorToCenter - ColorWidth / 2));
-            MoveBackwardByCm(FenceWidth/2);
-            VehicleProxy.RotateRight(90);
-            //FollowFence();
+            VehicleProxy.RotateRight(92);
+            MoveForwardByCm(VehicleLength/2 + ColorSensorToCenter);
         }
 
         public void LeftTurnAction()
         {
-            /*var hyp = Math.Sqrt(Math.Pow((FenceLength - FenceWidth), 2) + Math.Pow((FenceLength - FenceWidth), 2));
-            LcdConsole.WriteLine("hyp: {0}", hyp);
-            VehicleProxy.RotateLeft(45);
-            var driveLength = hyp - (VehicleLength / 2 + ColorSensorToCenter);
-            LcdConsole.WriteLine("driveLength: {0}", driveLength);
-            MoveForwardByCm(driveLength/2);
-            for (int i = 0; i < 2; i++)
-            {
-                VehicleProxy.RotateLeft(22);
-                MoveForwardByCm(driveLength / 4);
-            }*/
-            //FollowFence();
-
-            MoveForwardByCm(ColorWidth / 2);
-            VehicleProxy.RotateLeft(22);
-            var crossingWidth = FenceLength - FenceWidth;
-            MoveForwardByCm(Math.Sqrt(Math.Pow(crossingWidth / 2, 2) + Math.Pow(crossingWidth / 4, 2)));
-            VehicleProxy.RotateLeft(68);
-            MoveForwardByCm(Math.Sqrt(Math.Pow(crossingWidth / 2, 2) + Math.Pow(3*crossingWidth / 4, 2)));
-            VehicleProxy.RotateLeft(22);
+            MoveForwardByCm(ColorSensorFrontToBack);
+            var hyp = Math.Sqrt(Math.Pow(FenceLength, 2) + Math.Pow(FenceLength * 1 / 6, 2));
+            var alpha = Math.Asin(FenceLength / hyp)/(2*Math.PI) * 360 - 8;
+            LcdConsole.WriteLine("hyp {0}", hyp);
+            LcdConsole.WriteLine("alpha {0}", alpha);
+            VehicleProxy.RotateLeft((int)alpha);
+            MoveForwardByCm(hyp);
+            VehicleProxy.RotateLeft(90-(int)alpha);
         }
 
         public void StraightAheadAction()
         {
-            MoveForwardByCm(FenceLength - FenceWidth);
+            MoveForwardByCm(CrossingWidth + ColorWidth);
         }
 
         public void TurnBackAction()
         {
-            VehicleProxy.RotateLeft(45);
-            MoveForwardByCm(5);
-            VehicleProxy.RotateLeft(90);
-            MoveForwardByCm(5);
-            VehicleProxy.RotateLeft(45);
+            var c = CrossingWidth - VehicleWidth/2;
+            var cPow = Math.Pow(c/2, 2);
+            var hyp = Math.Sqrt(cPow + cPow);
 
-            //FollowFence();
+            VehicleProxy.RotateLeft(45);
+            MoveForwardByCm(hyp);
+            VehicleProxy.RotateLeft(90);
+            MoveForwardByCm(hyp);
+            VehicleProxy.RotateLeft(45);
         }
 
         public void TurnMotorsOff()

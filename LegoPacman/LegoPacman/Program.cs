@@ -16,10 +16,10 @@ namespace LegoPacman
     {   
         private static void PrintInfo()
         {
-            LcdConsole.WriteLine("up: followFence");
-            LcdConsole.WriteLine("left: moveByCm");
-            LcdConsole.WriteLine("right: readColor");
-            LcdConsole.WriteLine("down: getColor");
+            LcdConsole.WriteLine("up: straigth");
+            LcdConsole.WriteLine("left: left");
+            LcdConsole.WriteLine("right: rigth");
+            LcdConsole.WriteLine("down: back");
         }
 
         static void Main(string[] args)
@@ -42,31 +42,30 @@ namespace LegoPacman
 
             buttonEvents.UpPressed += () =>
             {
-                LcdConsole.WriteLine("starting followFence");
-                RoboTest.FollowFence();
-                LcdConsole.WriteLine("followFence done");
+                LcdConsole.WriteLine("starting straigth");
+                RoboTest.Straigth();
+                LcdConsole.WriteLine("straigth done");
             };
 
             buttonEvents.LeftPressed += () =>
             {
-                LcdConsole.WriteLine("starting moveByCm 3");
-                RoboTest.MoveByCm(3);
-                Thread.Sleep(2000);
-                LcdConsole.WriteLine("starting moveByCm 27");
-                RoboTest.MoveByCm(27);
-                LcdConsole.WriteLine("moveByCm done");
+                LcdConsole.WriteLine("starting left");
+                RoboTest.Left();
+                LcdConsole.WriteLine("left done");
             };
 
             buttonEvents.RightPressed += () =>
             {
-                LcdConsole.WriteLine("starting readColor");
-                RoboTest.ReadColor();
-                LcdConsole.WriteLine("readColor done");
+                LcdConsole.WriteLine("starting right");
+                RoboTest.Right();
+                LcdConsole.WriteLine("right done");
             };
 
             buttonEvents.DownPressed += () =>
             {
-                RoboTest.GetColor();
+                LcdConsole.WriteLine("starting back");
+                RoboTest.Back();
+                LcdConsole.WriteLine("back done");
             };
 
             terminateProgram.WaitOne();

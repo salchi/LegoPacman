@@ -20,14 +20,28 @@ namespace LegoPacman.classes
 
         public KnownColor Analyze(RGBColor c)
         {
+            return Analyze(c, false);
+        }
+
+        public KnownColor AnalyzeVerbose(RGBColor c)
+        {
+            return Analyze(c, true);
+        }
+
+        private KnownColor Analyze(RGBColor c, bool verbose)
+        {
             const double MaxAverageDistance = 35d;
             var currentDistance = MaxAverageDistance;
             var result = KnownColor.Invalid;
 
-            foreach(var color in ValidColors)
+            foreach (var color in ValidColors)
             {
                 var tempDistance = AverageDistance(color, c);
-                //LcdConsole.WriteLine("{0} {1} {2}", color, tempDistance, MaxDistance(kc, c));
+
+                if (verbose)
+                {
+                    LcdConsole.WriteLine("{0} {1} {2}", color, tempDistance, MaxDistance(color, c));
+                }
 
                 if (SpikeTest(color, c) && tempDistance < currentDistance)
                 {

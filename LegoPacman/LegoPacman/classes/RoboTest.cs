@@ -19,16 +19,51 @@ namespace LegoPacman.classes
             roboter.MoveForwardByCm(cm);
         }
 
+        public static void TurnBack()
+        {
+            roboter.TurnBackAction();
+        }
+
         public static void FollowFence()
         {
             roboter.FollowFence();
         }
 
+        public static void Left()
+        {
+            roboter.LeftTurnAction();
+        }
+
+        public static void Right()
+        {
+            roboter.RightTurnAction();
+        }
+
+        public static void Straigth()
+        {
+            roboter.StraightAheadAction();
+        }
+
+        public static void Back()
+        {
+            roboter.TurnBackAction();
+        }
+
+        public static void TestMotors()
+        {
+            LcdConsole.WriteLine("grabbing");
+            roboter.Grab();
+            LcdConsole.WriteLine("collecting");
+            roboter.Collect();
+        }
+
         public static void GetColor()
         {
-            var analyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.Fence_temp, KnownColor.Blue, KnownColor.Red, KnownColor.White, KnownColor.Yellow });
-            var lastRead = analyzer.Analyze(roboter.SensorProxy.ColorReader.ReadColor());
-            LcdConsole.WriteLine(lastRead.Name);
+            LcdConsole.Clear();
+            var analyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.FenceDark, KnownColor.FenceLight, KnownColor.Blue, KnownColor.Red, KnownColor.White, KnownColor.Yellow });
+            var lastRead = analyzer.AnalyzeVerbose(roboter.SensorProxy.ColorReader.ReadColor());
+            LcdConsole.WriteLine("----------");
+            LcdConsole.WriteLine("Winner: " + lastRead.ToString());
         }
 
         public static void Rotation(int start, int end, int step)
