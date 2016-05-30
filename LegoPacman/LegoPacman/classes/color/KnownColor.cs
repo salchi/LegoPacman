@@ -17,8 +17,8 @@ namespace LegoPacman.classes
         public static readonly KnownColor Blue = new KnownColor("Blue", new RGBColor(20, 75, 93));
         public static readonly KnownColor Red = new KnownColor("Red", new RGBColor(175, 21, 10));
         public static readonly KnownColor Yellow = new KnownColor("Yellow", new RGBColor(237, 187, 34));
-        public static readonly KnownColor White = new KnownColor("White", new RGBColor(280, 291, 177));*/
-
+        public static readonly KnownColor White = new KnownColor("White", new RGBColor(280, 291, 177));
+        */
         public static readonly KnownColor FenceLight = new KnownColor("FenceLight", new RGBColor(263, 162, 89));
         public static readonly KnownColor FenceDark = new KnownColor("FenceDark", new RGBColor(230, 140, 64));
         public static readonly KnownColor Blue = new KnownColor("Blue", new RGBColor(51, 86, 103));
@@ -33,10 +33,10 @@ namespace LegoPacman.classes
         public static readonly KnownColor Blue = new KnownColor("Blue", new RGBColor(25, 37, 35));
         public static readonly KnownColor Red = new KnownColor("Red", new RGBColor(148, 30, 16));
         public static readonly KnownColor Yellow = new KnownColor("Yellow", new RGBColor(289, 136, 35));
-        public static readonly KnownColor White = new KnownColor("White", new RGBColor(326, 281, 91));*/
-
+        public static readonly KnownColor White = new KnownColor("White", new RGBColor(326, 281, 91));
+        */
         public static List<KnownColor> ActionColors = new List<KnownColor>() { Blue, Red, Yellow, White };
-        public static List<KnownColor> FenceColors = new List<KnownColor>() { FenceDark, FenceLight };
+        public static List<KnownColor> FenceColors = new List<KnownColor>() { FenceDark, FenceLight/*Fence_temp*/ };
 
         public string Name { get; }
         public RGBColor RgbDefinition { get; }

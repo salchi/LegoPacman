@@ -16,7 +16,7 @@ namespace LegoPacman
     {   
         private static void PrintInfo()
         {
-            LcdConsole.WriteLine("up: straigth");
+            LcdConsole.WriteLine("up: followFence");
             LcdConsole.WriteLine("left: left");
             LcdConsole.WriteLine("right: rigth");
             LcdConsole.WriteLine("down: back");
@@ -26,23 +26,33 @@ namespace LegoPacman
         {
             var terminateProgram = new ManualResetEvent(false);
             var buttonEvents = new ButtonEvents();
+            var robo = new Roboter();
 
             buttonEvents.EscapePressed += () =>
             {
-                terminateProgram.Set();
-            };
+                lock (robo)
+                {
+                    robo.IsCancelled = true;
+                }
 
-            PrintInfo();
+                LcdConsole.WriteLine("restarting ...");
+                robo.TurnMotorsOff();
+                Thread.Sleep(2000);
+                robo.FollowFence();
+                //terminateProgram.Set();
+            };
+            //PrintInfo();
+            robo.FollowFence();
 
             buttonEvents.EnterPressed += () =>
             {
                 LcdConsole.Clear();
-                PrintInfo();
+                //PrintInfo();
             };
 
-            buttonEvents.UpPressed += () =>
+           /* buttonEvents.UpPressed += () =>
             {
-                LcdConsole.WriteLine("starting straigth");
+                LcdConsole.WriteLine("starting Straigth");
                 RoboTest.Straigth();
                 LcdConsole.WriteLine("straigth done");
             };
@@ -66,10 +76,9 @@ namespace LegoPacman
                 LcdConsole.WriteLine("starting back");
                 RoboTest.Back();
                 LcdConsole.WriteLine("back done");
-            };
+            };*/
 
             terminateProgram.WaitOne();
-            RoboTest.TurnOffMotors();
         }
     }
 }

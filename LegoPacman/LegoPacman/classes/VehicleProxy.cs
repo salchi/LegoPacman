@@ -179,6 +179,11 @@ namespace LegoPacman.classes
 
         public void Rotate(int degrees, RotationDirection direction)
         {
+            if (degrees == 0)
+            {
+                return;
+            }
+
             const int AngleStopSpinning = 3;
 
             sensorProxy.ResetGyro();

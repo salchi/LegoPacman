@@ -52,15 +52,15 @@ namespace LegoPacman.classes
         public static void TestMotors()
         {
             LcdConsole.WriteLine("grabbing");
-            roboter.Grab();
+            roboter.GrabPrincess();
             LcdConsole.WriteLine("collecting");
-            roboter.Collect();
+            roboter.CloseCollectorArm();
         }
 
         public static void GetColor()
         {
             LcdConsole.Clear();
-            var analyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.FenceDark, KnownColor.FenceLight, KnownColor.Blue, KnownColor.Red, KnownColor.White, KnownColor.Yellow });
+            var analyzer = new ColorAnalyzer(new List<KnownColor>() { KnownColor.FenceDark, KnownColor.FenceLight/*KnownColor.Fence_temp*/, KnownColor.Blue, KnownColor.Red, KnownColor.White, KnownColor.Yellow });
             var lastRead = analyzer.AnalyzeVerbose(roboter.SensorProxy.ColorReader.ReadColor());
             LcdConsole.WriteLine("----------");
             LcdConsole.WriteLine("Winner: " + lastRead.ToString());
